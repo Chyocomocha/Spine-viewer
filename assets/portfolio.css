@@ -147,7 +147,7 @@ button {
 
 .stage {
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     min-width: 0;
     min-height: 0;
     background: #191919;
@@ -216,12 +216,18 @@ button {
 }
 
 .work-detail {
-    min-height: 72px;
-    max-height: 24vh;
+    z-index: 3;
+    grid-row: 2;
+    grid-column: 1;
+    align-self: start;
+    max-height: min(180px, 24vh);
     overflow: auto;
+    margin: 12px 14px 0;
     padding: 14px 16px 16px;
-    background: #181818;
-    border-bottom: 1px solid var(--line);
+    background: rgba(24, 24, 24, 0.94);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
 }
 
 .meta-pill,
@@ -293,6 +299,8 @@ button {
 
 .viewer-wrap {
     position: relative;
+    grid-row: 2;
+    grid-column: 1;
     min-width: 0;
     min-height: 0;
     background: #191919;
