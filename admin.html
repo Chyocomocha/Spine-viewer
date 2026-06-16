@@ -4,62 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Portfolio Admin</title>
+<title>Portfolio Editor</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="./assets/admin.css">
 </head>
 <body>
-<main class="admin-app" aria-label="Portfolio admin">
+<main class="admin-app" aria-label="Portfolio editor">
     <header class="topbar">
         <div>
-            <h1>Portfolio Admin</h1>
-            <div class="repo-label">Local editor - data/portfolio.json</div>
+            <h1>Portfolio Editor</h1>
+            <div class="repo-label">로컬 편집기 - data/portfolio.json 자동 저장</div>
         </div>
         <div class="topbar-actions">
-            <a class="button secondary" href="./index.html">View</a>
-            <button class="button secondary" id="reload-button" type="button">Reload</button>
-            <button class="button primary" id="save-button" type="button">Save now</button>
+            <a class="button secondary" href="./index.html">보기</a>
+            <button class="button secondary" id="reload-button" type="button">다시 불러오기</button>
+            <button class="button primary" id="save-button" type="button">지금 저장</button>
         </div>
     </header>
 
     <section class="file-panel" aria-label="Local autosave">
-        <div class="file-help">Auto-saves to <strong>data/portfolio.json</strong> while this local editor is running. To publish, run <strong>publish-portfolio.bat</strong>.</div>
+        <div class="file-help">이 편집기를 실행한 동안 <strong>data/portfolio.json</strong>에 자동 저장됩니다. 공개하려면 <strong>publish-portfolio.bat</strong>을 실행하세요.</div>
         <div class="status" id="status"></div>
     </section>
 
     <section class="workspace">
-        <aside class="list-pane" aria-label="Categories">
+        <aside class="list-pane" aria-label="Groups">
             <div class="pane-head">
-                <h2>Categories</h2>
-                <button class="button compact" id="add-category-button" type="button">Add</button>
+                <h2>1. 그룹 선택</h2>
+                <button class="button compact" id="add-category-button" type="button">그룹 추가</button>
             </div>
             <div class="stack-list" id="category-list"></div>
         </aside>
 
         <section class="editor-pane" aria-label="Editor">
+            <div class="selection-summary" id="selection-summary"></div>
+            <div class="quick-guide">설명 수정: 왼쪽에서 그룹 선택 → 작업물/캐릭터 선택 → 플레이어 아래 설명 작성</div>
             <div class="tabs" role="tablist" aria-label="Edit sections">
-                <button class="tab active" type="button" data-tab="site">Site</button>
-                <button class="tab" type="button" data-tab="category">Category</button>
-                <button class="tab" type="button" data-tab="work">Work</button>
-                <button class="tab" type="button" data-tab="json">JSON</button>
+                <button class="tab active" type="button" data-tab="site">전체 설정</button>
+                <button class="tab" type="button" data-tab="category">그룹 편집</button>
+                <button class="tab" type="button" data-tab="work">작업물/캐릭터 설명</button>
+                <button class="tab" type="button" data-tab="json">데이터 확인</button>
             </div>
 
             <section class="tab-panel active" id="site-panel">
                 <div class="form-grid">
                     <label class="field">
-                        <span>Title</span>
+                        <span>포트폴리오 제목</span>
                         <input id="site-title" type="text">
                     </label>
                     <label class="field">
-                        <span>Subtitle</span>
+                        <span>부제목</span>
                         <input id="site-subtitle" type="text">
                     </label>
                     <label class="field wide">
-                        <span>Description</span>
+                        <span>소개글</span>
                         <textarea id="site-description" rows="4"></textarea>
                     </label>
                     <label class="field">
-                        <span>Default work</span>
+                        <span>처음 열 작업물</span>
                         <select id="site-default"></select>
                     </label>
                 </div>
@@ -69,9 +71,9 @@
                 <div class="split-editor">
                     <div>
                         <div class="section-actions">
-                            <button class="button compact" id="category-up-button" type="button">Up</button>
-                            <button class="button compact" id="category-down-button" type="button">Down</button>
-                            <button class="button danger compact" id="delete-category-button" type="button">Delete</button>
+                            <button class="button compact" id="category-up-button" type="button">위로</button>
+                            <button class="button compact" id="category-down-button" type="button">아래로</button>
+                            <button class="button danger compact" id="delete-category-button" type="button">그룹 삭제</button>
                         </div>
                         <div class="form-grid">
                             <label class="field">
@@ -79,23 +81,23 @@
                                 <input id="category-id" type="text" spellcheck="false">
                             </label>
                             <label class="field">
-                                <span>Title</span>
+                                <span>그룹 이름</span>
                                 <input id="category-title" type="text">
                             </label>
                             <label class="field wide">
-                                <span>Description</span>
+                                <span>그룹 설명</span>
                                 <textarea id="category-description" rows="4"></textarea>
                             </label>
                             <label class="check-field">
                                 <input id="category-hidden" type="checkbox">
-                                <span>Hidden</span>
+                                <span>공개 페이지에서 숨김</span>
                             </label>
                         </div>
                     </div>
                     <div>
                         <div class="pane-head inline">
-                            <h3>Works</h3>
-                            <button class="button compact" id="add-item-button" type="button">Add</button>
+                            <h3>2. 작업물/캐릭터 선택</h3>
+                            <button class="button compact" id="add-item-button" type="button">작업물 추가</button>
                         </div>
                         <div class="stack-list" id="item-list"></div>
                     </div>
@@ -103,10 +105,11 @@
             </section>
 
             <section class="tab-panel" id="work-panel">
+                <div class="work-focus" id="work-focus"></div>
                 <div class="section-actions">
-                    <button class="button compact" id="item-up-button" type="button">Up</button>
-                    <button class="button compact" id="item-down-button" type="button">Down</button>
-                    <button class="button danger compact" id="delete-item-button" type="button">Delete</button>
+                    <button class="button compact" id="item-up-button" type="button">위로</button>
+                    <button class="button compact" id="item-down-button" type="button">아래로</button>
+                    <button class="button danger compact" id="delete-item-button" type="button">작업물 삭제</button>
                 </div>
                 <div class="form-grid">
                     <label class="field">
@@ -114,45 +117,45 @@
                         <input id="item-id" type="text" spellcheck="false">
                     </label>
                     <label class="field">
-                        <span>Name</span>
+                        <span>작업물 이름</span>
                         <input id="item-name" type="text">
                     </label>
-                    <label class="field wide">
-                        <span>Description shown below player</span>
-                        <textarea id="item-description" rows="4"></textarea>
+                    <label class="field wide primary-field">
+                        <span>플레이어 아래 설명</span>
+                        <textarea id="item-description" rows="5" placeholder="이 작업물에 대한 설명을 입력하세요. 공개 페이지에서 플레이어 아래에 표시됩니다."></textarea>
                     </label>
                     <label class="field">
-                        <span>Badge</span>
+                        <span>표시 배지</span>
                         <input id="item-badge" type="text">
                     </label>
                     <label class="field">
-                        <span>File</span>
+                        <span>HTML 파일</span>
                         <input id="item-file" type="text" spellcheck="false">
                     </label>
                     <label class="field">
-                        <span>Category</span>
+                        <span>소속 그룹</span>
                         <select id="item-category"></select>
                     </label>
                     <label class="field">
-                        <span>Role</span>
+                        <span>역할</span>
                         <input id="item-role" type="text">
                     </label>
                     <label class="field">
-                        <span>Year</span>
+                        <span>연도</span>
                         <input id="item-year" type="text">
                     </label>
                     <label class="field wide">
-                        <span>Tags</span>
+                        <span>태그</span>
                         <input id="item-tags" type="text">
                     </label>
                     <label class="check-field">
                         <input id="item-hidden" type="checkbox">
-                        <span>Hidden</span>
+                        <span>공개 페이지에서 숨김</span>
                     </label>
                 </div>
                 <div class="links-head">
-                    <h3>Links</h3>
-                    <button class="button compact" id="add-link-button" type="button">Add</button>
+                    <h3>링크</h3>
+                    <button class="button compact" id="add-link-button" type="button">링크 추가</button>
                 </div>
                 <div class="links-list" id="links-list"></div>
             </section>
@@ -162,8 +165,8 @@
             </section>
         </section>
 
-        <aside class="validation-pane" aria-label="Validation">
-            <h2>Validation</h2>
+        <aside class="validation-pane" aria-label="Save status">
+            <h2>저장 상태</h2>
             <div class="validation-list" id="validation-list"></div>
         </aside>
     </section>

@@ -20,6 +20,8 @@ const dom = {
     categoryList: document.getElementById("category-list"),
     itemList: document.getElementById("item-list"),
     addItem: document.getElementById("add-item-button"),
+    selectionSummary: document.getElementById("selection-summary"),
+    workFocus: document.getElementById("work-focus"),
     tabs: document.querySelectorAll(".tab"),
     panels: document.querySelectorAll(".tab-panel"),
     siteTitle: document.getElementById("site-title"),
@@ -72,7 +74,7 @@ async function init() {
 
 function bindEvents() {
     dom.reload.addEventListener("click", async () => {
-        if (state.dirty && !window.confirm("Discard unsaved changes?")) return;
+        if (state.dirty && !window.confirm("저장되지 않은 변경사항을 버리고 다시 불러올까요?")) return;
         await reloadPortfolio(false);
     });
 
@@ -96,6 +98,9 @@ function bindEvents() {
         if (!button) return;
         state.categoryIndex = Number(button.dataset.categoryIndex);
         state.itemIndex = 0;
+        setTab("category");
+        const category = selectedCategory();
+        setStatus(`그룹 선택됨: ${category?.title || category?.id || "이름 없음"}`, "ok");
         renderAll();
     });
 
@@ -104,6 +109,8 @@ function bindEvents() {
         if (!button) return;
         state.itemIndex = Number(button.dataset.itemIndex);
         setTab("work");
+        const item = selectedItem();
+        setStatus(`작업물 선택됨: ${item?.name || item?.id || "이름 없음"}`, "ok");
         renderAll();
     });
 
@@ -139,12 +146,14 @@ function bindEvents() {
         if (!category) return;
         category.id = value;
         renderCategoryList();
+        renderSelectionSummary();
     });
     bindInput(dom.categoryTitle, value => {
         const category = selectedCategory();
         if (!category) return;
         category.title = value;
         renderCategoryList();
+        renderSelectionSummary();
     });
     bindInput(dom.categoryDescription, value => {
         const category = selectedCategory();
@@ -165,6 +174,8 @@ function bindEvents() {
         item.id = value;
         renderItemList();
         renderDefaultOptions();
+        renderSelectionSummary();
+        renderWorkFocus();
     });
     bindInput(dom.itemName, value => {
         const item = selectedItem();
@@ -172,6 +183,8 @@ function bindEvents() {
         item.name = value;
         renderItemList();
         renderDefaultOptions();
+        renderSelectionSummary();
+        renderWorkFocus();
     });
     bindInput(dom.itemBadge, value => {
         const item = selectedItem();
@@ -238,14 +251,14 @@ function bindEvents() {
 async function reloadPortfolio(keepStatus) {
     try {
         window.clearTimeout(state.saveTimer);
-        setStatus("Loading data...", "");
+        setStatus("데이터 불러오는 중...", "");
         state.portfolio = await loadPortfolio();
         state.categoryIndex = 0;
         state.itemIndex = 0;
         state.dirty = false;
         state.pendingSave = false;
         renderAll();
-        if (!keepStatus) setStatus("Auto save ready.", "ok");
+        if (!keepStatus) setStatus("자동 저장 준비됨.", "ok");
     } catch (error) {
         console.error(error);
         setStatus(error.message, "error");
@@ -258,7 +271,7 @@ async function savePortfolio(options = {}) {
     window.clearTimeout(state.saveTimer);
     const validation = validatePortfolio(state.portfolio);
     if (validation.errors.length) {
-        setStatus("Fix validation errors. Auto save paused.", "error");
+        setStatus("오류를 먼저 고쳐야 저장됩니다.", "error");
         renderValidation();
         return;
     }
@@ -271,7 +284,7 @@ async function savePortfolio(options = {}) {
     try {
         state.saveInFlight = true;
         updateButtons(validation);
-        setStatus(options.manual ? "Saving..." : "Auto saving...", "");
+        setStatus(options.manual ? "저장 중..." : "자동 저장 중...", "");
 
         const response = await fetch(SAVE_ENDPOINT, {
             method: "POST",
@@ -281,11 +294,11 @@ async function savePortfolio(options = {}) {
 
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-            throw new Error(payload.error || "Auto save failed. Start editor with edit-portfolio.bat.");
+            throw new Error(payload.error || "자동 저장 실패. edit-portfolio.bat으로 편집기를 실행하세요.");
         }
 
         state.dirty = false;
-        setStatus("Auto saved to data/portfolio.json.", "ok");
+        setStatus("data/portfolio.json에 자동 저장됨.", "ok");
         renderValidation();
     } catch (error) {
         console.error(error);
@@ -303,6 +316,7 @@ async function savePortfolio(options = {}) {
 
 function renderAll() {
     ensureSelection();
+    renderSelectionSummary();
     renderSiteForm();
     renderCategoryList();
     renderCategoryForm();
@@ -339,8 +353,8 @@ function renderCategoryList() {
         button.dataset.categoryIndex = String(index);
         button.classList.toggle("active", index === state.categoryIndex);
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
-        button.querySelector(".stack-name").textContent = category.title || "(untitled)";
-        button.querySelector(".stack-meta").textContent = `${category.items.length}${category.hidden ? " hidden" : ""}`;
+        button.querySelector(".stack-name").textContent = category.title || "(이름 없음)";
+        button.querySelector(".stack-meta").textContent = `${category.items.length}개${category.hidden ? " 숨김" : ""}`;
         dom.categoryList.appendChild(button);
     });
 }
@@ -384,14 +398,15 @@ function renderItemList() {
         button.dataset.itemIndex = String(index);
         button.classList.toggle("active", index === state.itemIndex);
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
-        button.querySelector(".stack-name").textContent = item.name || "(untitled)";
-        button.querySelector(".stack-meta").textContent = `${item.badge || item.id}${item.hidden ? " hidden" : ""}`;
+        button.querySelector(".stack-name").textContent = item.name || "(이름 없음)";
+        button.querySelector(".stack-meta").textContent = `${item.badge || item.id}${item.hidden ? " 숨김" : ""}`;
         dom.itemList.appendChild(button);
     });
 }
 
 function renderItemForm() {
     const item = selectedItem();
+    renderWorkFocus();
     setControlsDisabled([
         dom.itemUp,
         dom.itemDown,
@@ -441,9 +456,9 @@ function renderLinks() {
         const row = document.createElement("div");
         row.className = "link-row";
         row.innerHTML = `
-            <input type="text" data-link-index="${index}" data-link-field="label" placeholder="Label">
+            <input type="text" data-link-index="${index}" data-link-field="label" placeholder="링크 이름">
             <input type="text" data-link-index="${index}" data-link-field="url" placeholder="https://">
-            <button class="button danger compact" type="button" data-remove-link="${index}">Remove</button>
+            <button class="button danger compact" type="button" data-remove-link="${index}">삭제</button>
         `;
         row.querySelector('[data-link-field="label"]').value = link.label;
         row.querySelector('[data-link-field="url"]').value = link.url;
@@ -471,7 +486,7 @@ function renderValidation() {
     validation.warnings.forEach(message => addValidationMessage(message, "warning"));
 
     if (!validation.errors.length && !validation.warnings.length) {
-        addValidationMessage(state.dirty ? "Auto save pending." : "Auto save ready.", "ok");
+        addValidationMessage(state.dirty ? "자동 저장 대기 중." : "자동 저장 준비됨.", "ok");
     }
 
     updateButtons(validation);
@@ -496,6 +511,27 @@ function selectedCategory() {
 
 function selectedItem() {
     return selectedCategory()?.items[state.itemIndex] || null;
+}
+
+function renderSelectionSummary() {
+    const category = selectedCategory();
+    const item = selectedItem();
+
+    if (!category) {
+        dom.selectionSummary.textContent = "현재 선택: 그룹 없음";
+        return;
+    }
+
+    const categoryName = category.title || category.id || "이름 없는 그룹";
+    const itemName = item ? item.name || item.id || "이름 없는 작업물" : "작업물 없음";
+    dom.selectionSummary.textContent = `현재 선택: ${categoryName} / ${itemName}`;
+}
+
+function renderWorkFocus() {
+    const item = selectedItem();
+    dom.workFocus.textContent = item
+        ? `지금 편집 중: ${item.name || item.id || "이름 없는 작업물"} - 아래 설명은 공개 페이지의 플레이어 아래에 표시됩니다.`
+        : "작업물을 선택하면 설명을 편집할 수 있습니다.";
 }
 
 function ensureSelection() {
@@ -526,7 +562,7 @@ function moveCategory(direction) {
 
 function deleteCategory() {
     if (!selectedCategory()) return;
-    if (!window.confirm("Delete selected category?")) return;
+    if (!window.confirm("선택한 그룹을 삭제할까요?")) return;
     state.portfolio.categories.splice(state.categoryIndex, 1);
     state.categoryIndex = Math.max(0, state.categoryIndex - 1);
     state.itemIndex = 0;
@@ -563,7 +599,7 @@ function moveItemToCategory(nextCategoryIndex) {
 function deleteItem() {
     const category = selectedCategory();
     if (!category || !selectedItem()) return;
-    if (!window.confirm("Delete selected work?")) return;
+    if (!window.confirm("선택한 작업물을 삭제할까요?")) return;
     category.items.splice(state.itemIndex, 1);
     state.itemIndex = Math.max(0, state.itemIndex - 1);
     markDirty();
@@ -601,7 +637,7 @@ function bindInput(input, updater) {
 function markDirty() {
     state.dirty = true;
     if (!dom.status.classList.contains("error")) {
-        setStatus("Unsaved changes. Auto save pending...", "");
+        setStatus("변경됨. 자동 저장 대기 중...", "");
     }
     scheduleAutoSave();
 }

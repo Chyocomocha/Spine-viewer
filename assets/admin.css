@@ -63,11 +63,24 @@ select {
     line-height: 1.3;
 }
 
+.status {
+    min-width: 210px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    text-align: right;
+}
+
 .status.error {
+    border-color: rgba(208, 98, 98, 0.7);
+    background: rgba(208, 98, 98, 0.12);
     color: var(--danger);
 }
 
 .status.ok {
+    border-color: rgba(112, 197, 135, 0.55);
+    background: rgba(112, 197, 135, 0.1);
     color: var(--ok);
 }
 
@@ -115,6 +128,20 @@ select {
 .button:hover,
 .tab:hover {
     border-color: var(--accent-strong);
+}
+
+.button:focus-visible,
+.tab:focus-visible,
+.stack-button:focus-visible {
+    border-color: var(--accent-strong);
+    outline: 2px solid rgba(116, 168, 220, 0.55);
+    outline-offset: 2px;
+}
+
+.button:active,
+.tab:active,
+.stack-button:active {
+    transform: translateY(1px);
 }
 
 .button.primary {
@@ -207,8 +234,9 @@ select {
 }
 
 .stack-button.active {
-    background: rgba(79, 140, 201, 0.18);
-    border-color: var(--accent);
+    background: rgba(79, 140, 201, 0.32);
+    border-color: var(--accent-strong);
+    box-shadow: inset 4px 0 0 var(--accent-strong);
 }
 
 .stack-name {
@@ -238,9 +266,40 @@ select {
 }
 
 .tab.active {
+    background: rgba(79, 140, 201, 0.22);
+    border-color: var(--accent-strong);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: inset 0 3px 0 var(--accent-strong);
+}
+
+.selection-summary,
+.quick-guide,
+.work-focus {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
     background: var(--surface);
-    border-color: var(--line);
-    color: var(--accent-strong);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.selection-summary {
+    border-color: rgba(116, 168, 220, 0.55);
+    background: rgba(79, 140, 201, 0.14);
+    color: #dcecff;
+    font-weight: 700;
+}
+
+.quick-guide {
+    color: var(--muted);
+}
+
+.work-focus {
+    border-color: rgba(116, 168, 220, 0.6);
+    background: rgba(79, 140, 201, 0.1);
+    color: #dcecff;
 }
 
 .tab-panel {
@@ -265,6 +324,13 @@ select {
 
 .field.wide {
     grid-column: 1 / -1;
+}
+
+.primary-field {
+    padding: 12px;
+    border: 1px solid rgba(116, 168, 220, 0.45);
+    border-radius: 6px;
+    background: rgba(79, 140, 201, 0.08);
 }
 
 .field span,
@@ -302,6 +368,7 @@ textarea:focus,
 select:focus {
     border-color: var(--accent-strong);
     outline: none;
+    box-shadow: 0 0 0 2px rgba(116, 168, 220, 0.16);
 }
 
 .split-editor {
