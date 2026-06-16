@@ -10,6 +10,7 @@ const dom = {
     loading: document.getElementById("loading"),
     currentTitle: document.getElementById("current-title"),
     currentSubtitle: document.getElementById("current-subtitle"),
+    currentDescription: document.getElementById("current-description"),
     openButton: document.getElementById("open-button"),
     reloadButton: document.getElementById("reload-button"),
     itemCount: document.getElementById("item-count")
@@ -109,6 +110,8 @@ function selectItem(itemId, shouldUpdateUrl) {
 function renderCurrentItem(item) {
     dom.currentTitle.textContent = item.name;
     dom.currentSubtitle.textContent = [item.categoryTitle, item.badge].filter(Boolean).join(" / ");
+    dom.currentDescription.textContent = item.description || "";
+    dom.currentDescription.hidden = !item.description;
 }
 
 function setActiveButton(itemId) {
@@ -181,6 +184,8 @@ function renderFatalError(error) {
     disableActions(true);
     dom.currentTitle.textContent = "Portfolio data error";
     dom.currentSubtitle.textContent = "";
+    dom.currentDescription.textContent = "";
+    dom.currentDescription.hidden = true;
     dom.itemCount.textContent = "";
     dom.nav.innerHTML = "";
     setLoading(`${error.message}\nCheck data/portfolio.json and open this page through GitHub Pages or a local server.`, true);
