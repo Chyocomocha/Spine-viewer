@@ -1,0 +1,177 @@
+{
+  "site": {
+    "title": "Spine Portfolio",
+    "subtitle": "Interactive animation works",
+    "defaultItemId": "narin"
+  },
+  "categories": [
+    {
+      "id": "character",
+      "title": "Character",
+      "items": [
+        {
+          "id": "narin",
+          "name": "Narin",
+          "badge": "LD",
+          "file": "Narin.html"
+        },
+        {
+          "id": "narin-ik",
+          "name": "Narin IK",
+          "badge": "IK",
+          "file": "Narin_IK.html"
+        },
+        {
+          "id": "mongle",
+          "name": "Mongle",
+          "badge": "LD",
+          "file": "Mongle.html"
+        },
+        {
+          "id": "hina",
+          "name": "Hina",
+          "badge": "LD",
+          "file": "Hina.html"
+        },
+        {
+          "id": "siphon",
+          "name": "Siphon",
+          "badge": "LD",
+          "file": "Siphon.html"
+        }
+      ]
+    },
+    {
+      "id": "sd-character",
+      "title": "SD Character",
+      "items": [
+        {
+          "id": "sd-narin",
+          "name": "Narin",
+          "badge": "SD",
+          "file": "SD_Narin.html"
+        },
+        {
+          "id": "sd-mongle",
+          "name": "Mongle",
+          "badge": "SD",
+          "file": "SD_Mongle.html"
+        },
+        {
+          "id": "sd-hina",
+          "name": "Hina",
+          "badge": "SD",
+          "file": "SD_Hina.html"
+        },
+        {
+          "id": "sd-siphon",
+          "name": "Siphon",
+          "badge": "SD",
+          "file": "SD_Siphon.html"
+        }
+      ]
+    },
+    {
+      "id": "cutscene",
+      "title": "Cutscene",
+      "items": [
+        {
+          "id": "cut-narin",
+          "name": "Narin",
+          "badge": "Scene",
+          "file": "Narin_Story_Scene.html"
+        },
+        {
+          "id": "cut-mongle",
+          "name": "Mongle",
+          "badge": "Scene",
+          "file": "Mongle_Story_Scene.html"
+        },
+        {
+          "id": "cut-hina",
+          "name": "Hina",
+          "badge": "Scene",
+          "file": "Hina_Story_Scene.html"
+        }
+      ]
+    },
+    {
+      "id": "monster",
+      "title": "Monster",
+      "items": [
+        {
+          "id": "flower",
+          "name": "Flower Monster",
+          "badge": "Boss",
+          "file": "Monster_Boss_Flower.html"
+        },
+        {
+          "id": "flower-2",
+          "name": "Flower Boss 2",
+          "badge": "Boss",
+          "file": "Monster_Boss_Flower2.html"
+        },
+        {
+          "id": "cragor",
+          "name": "Cragor",
+          "badge": "Boss",
+          "file": "CragorBoss.html"
+        },
+        {
+          "id": "wing",
+          "name": "Wing",
+          "badge": "Boss",
+          "file": "Monster_Boss_Wing.html"
+        },
+        {
+          "id": "mirelord",
+          "name": "Mirelord",
+          "badge": "Boss",
+          "file": "MirelordBoss.html"
+        }
+      ]
+    },
+    {
+      "id": "joint-projects",
+      "title": "Joint Projects",
+      "items": [
+        {
+          "id": "artz",
+          "name": "Artz",
+          "badge": "Character",
+          "file": "Artz.html"
+        },
+        {
+          "id": "cola",
+          "name": "Cola",
+          "badge": "Character",
+          "file": "Cola.html"
+        },
+        {
+          "id": "artz-ingame",
+          "name": "Artz Ingame",
+          "badge": "Ingame",
+          "file": "Artz_Ingame.html"
+        },
+        {
+          "id": "cola-ingame",
+          "name": "Cola Ingame",
+          "badge": "Ingame",
+          "file": "Cola_Ingame.html"
+        },
+        {
+          "id": "girl",
+          "name": "Girl Character",
+          "badge": "Character",
+          "file": "Girl_Character.html"
+        },
+        {
+          "id": "boy",
+          "name": "Boy Character",
+          "badge": "Character",
+          "file": "Boy_Character.html"
+        }
+      ]
+    }
+  ]
+}
