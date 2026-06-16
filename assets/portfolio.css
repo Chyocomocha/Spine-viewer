@@ -154,9 +154,9 @@ button {
 }
 
 .toolbar {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     min-width: 0;
     padding: 12px 14px;
@@ -185,6 +185,59 @@ button {
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.current-description {
+    max-width: 980px;
+    margin: 8px 0 0;
+    color: #d7d7d7;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.current-description:empty,
+.current-meta:empty,
+.current-tags:empty,
+.current-links:empty {
+    display: none;
+}
+
+.current-meta,
+.current-tags,
+.current-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.meta-pill,
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.tag-pill {
+    border-color: rgba(79, 140, 201, 0.45);
+    color: var(--accent-strong);
+}
+
+.work-link {
+    color: var(--accent-strong);
+    font-size: 12px;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.work-link:hover {
+    text-decoration: underline;
 }
 
 .toolbar-actions {
@@ -270,7 +323,7 @@ button {
 
     .app {
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(480px, 1fr);
+        grid-template-rows: auto minmax(520px, 1fr);
         min-height: 100%;
     }
 
@@ -289,5 +342,9 @@ button {
     .group {
         flex: 0 0 min(260px, 78vw);
         margin-bottom: 0;
+    }
+
+    .toolbar {
+        align-items: start;
     }
 }

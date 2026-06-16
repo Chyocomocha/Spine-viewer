@@ -1,6 +1,6 @@
 "use strict";
 
-const DATA_URL = "./data/portfolio.json";
+import { flattenItems, loadPortfolio, visibleCategories } from "./portfolio-data.js";
 
 const dom = {
     title: document.getElementById("site-title"),
@@ -10,12 +10,17 @@ const dom = {
     loading: document.getElementById("loading"),
     currentTitle: document.getElementById("current-title"),
     currentSubtitle: document.getElementById("current-subtitle"),
+    currentDescription: document.getElementById("current-description"),
+    currentMeta: document.getElementById("current-meta"),
+    currentTags: document.getElementById("current-tags"),
+    currentLinks: document.getElementById("current-links"),
     openButton: document.getElementById("open-button"),
     reloadButton: document.getElementById("reload-button"),
     itemCount: document.getElementById("item-count")
 };
 
 let portfolio = null;
+let categories = [];
 let allItems = [];
 let currentItem = null;
 let currentFrame = null;
@@ -29,58 +34,19 @@ async function init() {
     setLoading("Loading portfolio", false);
 
     try {
-        const response = await fetch(DATA_URL, { cache: "no-store" });
-        if (!response.ok) throw new Error(`Could not load ${DATA_URL} (${response.status})`);
-
-        portfolio = normalizePortfolio(await response.json());
-        allItems = flattenItems(portfolio.categories);
+        portfolio = await loadPortfolio();
+        categories = visibleCategories(portfolio);
+        allItems = flattenItems(portfolio);
         if (!allItems.length) throw new Error("No visible portfolio items were found.");
 
         renderSite(portfolio.site, allItems.length);
-        renderNav(portfolio.categories);
+        renderNav(categories);
         disableActions(false);
         selectItem(getInitialItemId(), false);
     } catch (error) {
         console.error(error);
         renderFatalError(error);
     }
-}
-
-function normalizePortfolio(raw) {
-    const site = raw?.site ?? {};
-    const categories = Array.isArray(raw?.categories) ? raw.categories : [];
-
-    return {
-        site: {
-            title: textOrDefault(site.title, "Spine Portfolio"),
-            subtitle: textOrDefault(site.subtitle, ""),
-            defaultItemId: textOrDefault(site.defaultItemId, "")
-        },
-        categories: categories
-            .filter(category => !category.hidden)
-            .map(category => ({
-                id: textOrDefault(category.id, slugify(category.title)),
-                title: textOrDefault(category.title, "Untitled"),
-                items: Array.isArray(category.items)
-                    ? category.items.filter(item => !item.hidden).map(item => ({
-                        id: textOrDefault(item.id, slugify(item.name || item.file)),
-                        name: textOrDefault(item.name, "Untitled"),
-                        badge: textOrDefault(item.badge, ""),
-                        file: textOrDefault(item.file, ""),
-                        description: textOrDefault(item.description, "")
-                    })).filter(item => item.file)
-                    : []
-            }))
-            .filter(category => category.items.length)
-    };
-}
-
-function flattenItems(categories) {
-    return categories.flatMap(category => category.items.map(item => ({
-        ...item,
-        categoryId: category.id,
-        categoryTitle: category.title
-    })));
 }
 
 function renderSite(site, count) {
@@ -91,10 +57,10 @@ function renderSite(site, count) {
     dom.itemCount.textContent = `${count} works`;
 }
 
-function renderNav(categories) {
+function renderNav(nextCategories) {
     dom.nav.innerHTML = "";
 
-    categories.forEach(category => {
+    nextCategories.forEach(category => {
         const section = document.createElement("section");
         section.className = "group";
 
@@ -137,18 +103,56 @@ function selectItem(itemId, shouldUpdateUrl) {
     if (!item || currentItem?.id === item.id) return;
 
     currentItem = item;
-    dom.currentTitle.textContent = item.name;
-    dom.currentSubtitle.textContent = getSubtitle(item);
+    renderCurrentItem(item);
     setActiveButton(item.id);
     replaceFrame(item);
 
     if (shouldUpdateUrl) updateUrl(item.id);
 }
 
-function getSubtitle(item) {
-    const parts = [item.categoryTitle, item.badge].filter(Boolean);
-    if (item.description) parts.push(item.description);
-    return parts.join(" / ");
+function renderCurrentItem(item) {
+    dom.currentTitle.textContent = item.name;
+    dom.currentSubtitle.textContent = [item.categoryTitle, item.badge].filter(Boolean).join(" / ");
+    dom.currentDescription.textContent = item.description;
+    renderMeta(item);
+    renderTags(item.tags);
+    renderLinks(item.links);
+}
+
+function renderMeta(item) {
+    dom.currentMeta.innerHTML = "";
+    [
+        item.role ? `Role: ${item.role}` : "",
+        item.year ? `Year: ${item.year}` : ""
+    ].filter(Boolean).forEach(value => {
+        const pill = document.createElement("span");
+        pill.className = "meta-pill";
+        pill.textContent = value;
+        dom.currentMeta.appendChild(pill);
+    });
+}
+
+function renderTags(tags) {
+    dom.currentTags.innerHTML = "";
+    tags.forEach(tag => {
+        const pill = document.createElement("span");
+        pill.className = "tag-pill";
+        pill.textContent = tag;
+        dom.currentTags.appendChild(pill);
+    });
+}
+
+function renderLinks(links) {
+    dom.currentLinks.innerHTML = "";
+    links.forEach(link => {
+        const anchor = document.createElement("a");
+        anchor.className = "work-link";
+        anchor.href = link.url;
+        anchor.target = "_blank";
+        anchor.rel = "noopener";
+        anchor.textContent = link.label || link.url;
+        dom.currentLinks.appendChild(anchor);
+    });
 }
 
 function setActiveButton(itemId) {
@@ -221,21 +225,13 @@ function renderFatalError(error) {
     disableActions(true);
     dom.currentTitle.textContent = "Portfolio data error";
     dom.currentSubtitle.textContent = "";
+    dom.currentDescription.textContent = "";
+    dom.currentMeta.innerHTML = "";
+    dom.currentTags.innerHTML = "";
+    dom.currentLinks.innerHTML = "";
     dom.itemCount.textContent = "";
     dom.nav.innerHTML = "";
     setLoading(`${error.message}\nCheck data/portfolio.json and open this page through GitHub Pages or a local server.`, true);
-}
-
-function textOrDefault(value, fallback) {
-    return typeof value === "string" && value.trim() ? value.trim() : fallback;
-}
-
-function slugify(value) {
-    return String(value || "item")
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "item";
 }
 
 dom.openButton.addEventListener("click", () => {

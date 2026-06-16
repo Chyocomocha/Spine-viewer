@@ -1,175 +1,325 @@
 {
+  "schemaVersion": 1,
   "site": {
     "title": "Spine Portfolio",
     "subtitle": "Interactive animation works",
+    "description": "A curated portfolio of Spine animation and character work.",
     "defaultItemId": "narin"
   },
   "categories": [
     {
       "id": "character",
       "title": "Character",
+      "description": "Large character animation viewers.",
+      "hidden": false,
       "items": [
         {
           "id": "narin",
           "name": "Narin",
           "badge": "LD",
-          "file": "Narin.html"
+          "file": "Narin.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "narin-ik",
           "name": "Narin IK",
           "badge": "IK",
-          "file": "Narin_IK.html"
+          "file": "Narin_IK.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "mongle",
           "name": "Mongle",
           "badge": "LD",
-          "file": "Mongle.html"
+          "file": "Mongle.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "hina",
           "name": "Hina",
           "badge": "LD",
-          "file": "Hina.html"
+          "file": "Hina.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "siphon",
           "name": "Siphon",
           "badge": "LD",
-          "file": "Siphon.html"
+          "file": "Siphon.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         }
       ]
     },
     {
       "id": "sd-character",
       "title": "SD Character",
+      "description": "Small character animation viewers.",
+      "hidden": false,
       "items": [
         {
           "id": "sd-narin",
           "name": "Narin",
           "badge": "SD",
-          "file": "SD_Narin.html"
+          "file": "SD_Narin.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "sd-mongle",
           "name": "Mongle",
           "badge": "SD",
-          "file": "SD_Mongle.html"
+          "file": "SD_Mongle.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "sd-hina",
           "name": "Hina",
           "badge": "SD",
-          "file": "SD_Hina.html"
+          "file": "SD_Hina.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "sd-siphon",
           "name": "Siphon",
           "badge": "SD",
-          "file": "SD_Siphon.html"
+          "file": "SD_Siphon.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         }
       ]
     },
     {
       "id": "cutscene",
       "title": "Cutscene",
+      "description": "Story and scene animation viewers.",
+      "hidden": false,
       "items": [
         {
           "id": "cut-narin",
           "name": "Narin",
           "badge": "Scene",
-          "file": "Narin_Story_Scene.html"
+          "file": "Narin_Story_Scene.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "cut-mongle",
           "name": "Mongle",
           "badge": "Scene",
-          "file": "Mongle_Story_Scene.html"
+          "file": "Mongle_Story_Scene.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "cut-hina",
           "name": "Hina",
           "badge": "Scene",
-          "file": "Hina_Story_Scene.html"
+          "file": "Hina_Story_Scene.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         }
       ]
     },
     {
       "id": "monster",
       "title": "Monster",
+      "description": "Monster and boss animation viewers.",
+      "hidden": false,
       "items": [
         {
           "id": "flower",
           "name": "Flower Monster",
           "badge": "Boss",
-          "file": "Monster_Boss_Flower.html"
+          "file": "Monster_Boss_Flower.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "flower-2",
           "name": "Flower Boss 2",
           "badge": "Boss",
-          "file": "Monster_Boss_Flower2.html"
+          "file": "Monster_Boss_Flower2.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "cragor",
           "name": "Cragor",
           "badge": "Boss",
-          "file": "CragorBoss.html"
+          "file": "CragorBoss.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "wing",
           "name": "Wing",
           "badge": "Boss",
-          "file": "Monster_Boss_Wing.html"
+          "file": "Monster_Boss_Wing.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "mirelord",
           "name": "Mirelord",
           "badge": "Boss",
-          "file": "MirelordBoss.html"
+          "file": "MirelordBoss.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         }
       ]
     },
     {
       "id": "joint-projects",
       "title": "Joint Projects",
+      "description": "Collaborative character and ingame animation work.",
+      "hidden": false,
       "items": [
         {
           "id": "artz",
           "name": "Artz",
           "badge": "Character",
-          "file": "Artz.html"
+          "file": "Artz.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "cola",
           "name": "Cola",
           "badge": "Character",
-          "file": "Cola.html"
+          "file": "Cola.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "artz-ingame",
           "name": "Artz Ingame",
           "badge": "Ingame",
-          "file": "Artz_Ingame.html"
+          "file": "Artz_Ingame.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "cola-ingame",
           "name": "Cola Ingame",
           "badge": "Ingame",
-          "file": "Cola_Ingame.html"
+          "file": "Cola_Ingame.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "girl",
           "name": "Girl Character",
           "badge": "Character",
-          "file": "Girl_Character.html"
+          "file": "Girl_Character.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         },
         {
           "id": "boy",
           "name": "Boy Character",
           "badge": "Character",
-          "file": "Boy_Character.html"
+          "file": "Boy_Character.html",
+          "description": "",
+          "role": "",
+          "year": "",
+          "tags": [],
+          "links": [],
+          "hidden": false
         }
       ]
     }
