@@ -293,23 +293,6 @@ select {
     border-color: var(--line);
 }
 
-.group-button {
-    cursor: grab;
-}
-
-.group-button:active {
-    cursor: grabbing;
-}
-
-.tree-group.dragging {
-    opacity: 0.55;
-}
-
-.tree-group.drop-target > .group-button {
-    border-color: var(--ok);
-    box-shadow: inset 4px 0 0 var(--ok);
-}
-
 .stack-button.active {
     background: rgba(79, 140, 201, 0.32);
     border-color: var(--accent-strong);

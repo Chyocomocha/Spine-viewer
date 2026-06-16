@@ -65,9 +65,7 @@ const state = {
     dirty: false,
     saveTimer: null,
     saveInFlight: false,
-    pendingSave: false,
-    dragCategoryIndex: null,
-    suppressNextClick: false
+    pendingSave: false
 };
 
 bindEvents();
@@ -105,11 +103,6 @@ function bindEvents() {
     });
 
     dom.categoryList.addEventListener("click", event => {
-        if (state.suppressNextClick) {
-            state.suppressNextClick = false;
-            return;
-        }
-
         const itemButton = event.target.closest("[data-item-index]");
         if (itemButton) {
             state.categoryIndex = Number(itemButton.dataset.categoryIndex);
@@ -131,46 +124,6 @@ function bindEvents() {
         setStatus(`그룹 정보: ${category?.title || category?.id || "이름 없음"}`, "ok");
         renderAll();
     });
-
-    dom.categoryList.addEventListener("dragstart", event => {
-        const button = event.target.closest(".group-button");
-        if (!button) return;
-        state.dragCategoryIndex = Number(button.dataset.categoryIndex);
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", button.dataset.categoryIndex);
-        button.closest(".tree-group")?.classList.add("dragging");
-    });
-
-    dom.categoryList.addEventListener("dragover", event => {
-        if (state.dragCategoryIndex === null) return;
-        const group = event.target.closest(".tree-group");
-        if (!group) return;
-        event.preventDefault();
-        clearDropTargets();
-        group.classList.add("drop-target");
-        event.dataTransfer.dropEffect = "move";
-    });
-
-    dom.categoryList.addEventListener("dragleave", event => {
-        const group = event.target.closest(".tree-group");
-        if (!group || group.contains(event.relatedTarget)) return;
-        group.classList.remove("drop-target");
-    });
-
-    dom.categoryList.addEventListener("drop", event => {
-        if (state.dragCategoryIndex === null) return;
-        const group = event.target.closest(".tree-group");
-        if (!group) return;
-        event.preventDefault();
-
-        const targetButton = group.querySelector(".group-button");
-        const targetIndex = Number(targetButton?.dataset.categoryIndex);
-        moveCategoryToIndex(state.dragCategoryIndex, targetIndex);
-        state.suppressNextClick = true;
-        clearDragState();
-    });
-
-    dom.categoryList.addEventListener("dragend", clearDragState);
 
     dom.addItem.addEventListener("click", () => {
         const category = selectedCategory();
@@ -414,7 +367,6 @@ function renderCategoryList() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "stack-button group-button";
-        button.draggable = true;
         button.dataset.categoryIndex = String(index);
         button.classList.toggle("active", index === state.categoryIndex);
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
@@ -648,35 +600,6 @@ function ensureSelection() {
         return;
     }
     state.itemIndex = clamp(state.itemIndex, 0, category.items.length - 1);
-}
-
-function moveCategoryToIndex(fromIndex, toIndex) {
-    const categories = state.portfolio.categories;
-    if (!Number.isInteger(fromIndex) || !Number.isInteger(toIndex)) return;
-    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= categories.length || toIndex >= categories.length) return;
-
-    const [movedCategory] = categories.splice(fromIndex, 1);
-    categories.splice(toIndex, 0, movedCategory);
-    state.categoryIndex = toIndex;
-    state.itemIndex = 0;
-    setEditorMode("group");
-    markDirty();
-    renderAll();
-    setStatus(`그룹 순서 변경됨: ${movedCategory.title || movedCategory.id || "이름 없음"}`, "ok");
-}
-
-function clearDropTargets() {
-    dom.categoryList.querySelectorAll(".drop-target").forEach(group => {
-        group.classList.remove("drop-target");
-    });
-}
-
-function clearDragState() {
-    state.dragCategoryIndex = null;
-    dom.categoryList.querySelectorAll(".dragging").forEach(group => {
-        group.classList.remove("dragging");
-    });
-    clearDropTargets();
 }
 
 function deleteCategory() {
