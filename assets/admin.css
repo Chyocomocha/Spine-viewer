@@ -38,7 +38,7 @@ select {
 }
 
 .topbar,
-.auth-panel {
+.file-panel {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -142,12 +142,15 @@ select {
     opacity: 0.45;
 }
 
-.auth-panel {
+.file-panel {
     align-items: end;
 }
 
-.token-field {
-    width: min(540px, 55vw);
+.file-help {
+    flex: 1 1 auto;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
 }
 
 .workspace {

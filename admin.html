@@ -13,20 +13,18 @@
     <header class="topbar">
         <div>
             <h1>Portfolio Admin</h1>
-            <div class="repo-label">Chyocomocha/Spine-viewer · data/portfolio.json</div>
+            <div class="repo-label">Local editor - data/portfolio.json</div>
         </div>
         <div class="topbar-actions">
             <a class="button secondary" href="./index.html">View</a>
             <button class="button secondary" id="reload-button" type="button">Reload</button>
-            <button class="button primary" id="save-button" type="button">Save</button>
+            <button class="button primary" id="save-button" type="button">Save local file</button>
         </div>
     </header>
 
-    <section class="auth-panel" aria-label="GitHub token">
-        <label class="field token-field">
-            <span>GitHub token</span>
-            <input id="token-input" type="password" autocomplete="off" spellcheck="false">
-        </label>
+    <section class="file-panel" aria-label="Local data file">
+        <button class="button secondary" id="choose-file-button" type="button">Choose data file</button>
+        <div class="file-help">First choose <strong>data/portfolio.json</strong>, then edit and save. To publish, run <strong>publish-portfolio.bat</strong>.</div>
         <div class="status" id="status"></div>
     </section>
 

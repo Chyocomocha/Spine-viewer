@@ -2,13 +2,6 @@
 
 export const PORTFOLIO_DATA_URL = "./data/portfolio.json";
 
-export const GITHUB_REPOSITORY = {
-    owner: "Chyocomocha",
-    repo: "Spine-viewer",
-    branch: "main",
-    dataPath: "data/portfolio.json"
-};
-
 export async function loadPortfolio(url = PORTFOLIO_DATA_URL) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`Could not load ${url} (${response.status})`);

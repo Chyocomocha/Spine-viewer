@@ -9,12 +9,9 @@ import {
     serializePortfolio,
     validatePortfolio
 } from "./portfolio-data.js";
-import { savePortfolioToGitHub } from "./github-storage.js";
-
-const TOKEN_KEY = "spinePortfolioGitHubToken";
 
 const dom = {
-    token: document.getElementById("token-input"),
+    chooseFile: document.getElementById("choose-file-button"),
     status: document.getElementById("status"),
     reload: document.getElementById("reload-button"),
     save: document.getElementById("save-button"),
@@ -59,23 +56,19 @@ const state = {
     categoryIndex: 0,
     itemIndex: 0,
     activeTab: "site",
-    dirty: false
+    dirty: false,
+    fileHandle: null
 };
 
 bindEvents();
 init();
 
 async function init() {
-    dom.token.value = sessionStorage.getItem(TOKEN_KEY) || "";
     await reloadPortfolio(false);
 }
 
 function bindEvents() {
-    dom.token.addEventListener("input", () => {
-        sessionStorage.setItem(TOKEN_KEY, dom.token.value.trim());
-        renderValidation();
-    });
-
+    dom.chooseFile.addEventListener("click", chooseDataFile);
     dom.reload.addEventListener("click", async () => {
         if (state.dirty && !window.confirm("Discard unsaved changes?")) return;
         await reloadPortfolio(false);
@@ -243,7 +236,9 @@ function bindEvents() {
 async function reloadPortfolio(keepStatus) {
     try {
         setStatus("Loading data...", "");
-        state.portfolio = await loadPortfolio();
+        state.portfolio = state.fileHandle
+            ? normalizePortfolio(JSON.parse(await (await state.fileHandle.getFile()).text()))
+            : await loadPortfolio();
         state.categoryIndex = 0;
         state.itemIndex = 0;
         state.dirty = false;
@@ -265,10 +260,10 @@ async function savePortfolio() {
 
     try {
         dom.save.disabled = true;
-        setStatus("Saving to GitHub...", "");
-        const result = await savePortfolioToGitHub(state.portfolio, dom.token.value);
+        setStatus("Saving local file...", "");
+        await saveLocalPortfolio();
         state.dirty = false;
-        setStatus(`Saved: ${result.commit.sha.slice(0, 7)}`, "ok");
+        setStatus("Saved locally. Run publish-portfolio.bat to publish.", "ok");
         renderValidation();
     } catch (error) {
         console.error(error);
@@ -277,6 +272,61 @@ async function savePortfolio() {
     } finally {
         updateButtons();
     }
+}
+
+async function chooseDataFile() {
+    if (!supportsFileSystemAccess()) {
+        setStatus("This browser cannot write local files directly. Use Microsoft Edge or Chrome.", "error");
+        return;
+    }
+    if (state.dirty && !window.confirm("Discard unsaved changes and reload the selected file?")) return;
+
+    try {
+        state.fileHandle = await pickPortfolioFile();
+        await reloadPortfolio(true);
+        setStatus(`Using ${state.fileHandle.name}.`, "ok");
+    } catch (error) {
+        if (error.name === "AbortError") return;
+        console.error(error);
+        setStatus(error.message, "error");
+    }
+}
+
+async function saveLocalPortfolio() {
+    if (!state.fileHandle) {
+        if (!supportsFileSystemAccess()) {
+            downloadPortfolioJson();
+            setStatus("Downloaded portfolio.json. Replace data/portfolio.json with that file, then publish.", "ok");
+            return;
+        }
+        state.fileHandle = await pickPortfolioFile();
+        if (!state.fileHandle) throw new Error("Choose data/portfolio.json before saving.");
+    }
+
+    const writable = await state.fileHandle.createWritable();
+    await writable.write(serializePortfolio(state.portfolio));
+    await writable.close();
+}
+
+async function pickPortfolioFile() {
+    const [handle] = await window.showOpenFilePicker({
+        multiple: false,
+        types: [{
+            description: "Portfolio JSON",
+            accept: { "application/json": [".json"] }
+        }]
+    });
+    return handle;
+}
+
+function downloadPortfolioJson() {
+    const blob = new Blob([serializePortfolio(state.portfolio)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "portfolio.json";
+    anchor.click();
+    URL.revokeObjectURL(url);
 }
 
 function renderAll() {
@@ -445,15 +495,16 @@ function renderValidation() {
     const validation = validatePortfolio(state.portfolio);
     dom.validationList.innerHTML = "";
 
-    if (!dom.token.value.trim()) {
-        addValidationMessage("GitHub token is required to save.", "warning");
+    const hasFileHandle = Boolean(state.fileHandle);
+    if (!hasFileHandle) {
+        addValidationMessage("Choose data/portfolio.json before saving.", "warning");
     }
 
     validation.errors.forEach(message => addValidationMessage(message, "error"));
     validation.warnings.forEach(message => addValidationMessage(message, "warning"));
 
-    if (!validation.errors.length && !validation.warnings.length && dom.token.value.trim()) {
-        addValidationMessage("Ready to save.", "ok");
+    if (!validation.errors.length && !validation.warnings.length && hasFileHandle) {
+        addValidationMessage(state.fileHandle ? "Ready to save locally." : "Ready. Save will ask for data/portfolio.json.", "ok");
     }
 
     updateButtons(validation);
@@ -595,7 +646,7 @@ function updateButtons(validation) {
 
     const nextValidation = validation || validatePortfolio(state.portfolio);
     const hasErrors = nextValidation.errors.length > 0;
-    dom.save.disabled = hasErrors || !dom.token.value.trim();
+    dom.save.disabled = hasErrors;
 
     const category = selectedCategory();
     const item = selectedItem();
@@ -624,4 +675,8 @@ function splitTags(value) {
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
+}
+
+function supportsFileSystemAccess() {
+    return typeof window.showOpenFilePicker === "function";
 }
