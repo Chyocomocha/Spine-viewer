@@ -113,7 +113,8 @@ function selectItem(itemId, shouldUpdateUrl) {
 function renderCurrentItem(item) {
     dom.currentTitle.textContent = item.name;
     dom.currentSubtitle.textContent = [item.categoryTitle, item.badge].filter(Boolean).join(" / ");
-    dom.currentDescription.textContent = item.description;
+    dom.currentDescription.textContent = item.description || "No description yet.";
+    dom.currentDescription.classList.toggle("empty", !item.description);
     renderMeta(item);
     renderTags(item.tags);
     renderLinks(item.links);

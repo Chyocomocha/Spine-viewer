@@ -147,7 +147,7 @@ button {
 
 .stage {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
     min-width: 0;
     min-height: 0;
     background: #191919;
@@ -188,18 +188,22 @@ button {
 }
 
 .current-description {
-    max-width: 980px;
-    margin: 8px 0 0;
+    max-width: 1120px;
+    margin: 0;
     color: #d7d7d7;
     font-size: 13px;
     line-height: 1.45;
+    white-space: pre-wrap;
 }
 
-.current-description:empty,
 .current-meta:empty,
 .current-tags:empty,
 .current-links:empty {
     display: none;
+}
+
+.current-description.empty {
+    color: #777;
 }
 
 .current-meta,
@@ -209,6 +213,15 @@ button {
     flex-wrap: wrap;
     gap: 6px;
     margin-top: 8px;
+}
+
+.work-detail {
+    min-height: 88px;
+    max-height: 28vh;
+    overflow: auto;
+    padding: 14px 16px 16px;
+    background: #181818;
+    border-top: 1px solid var(--line);
 }
 
 .meta-pill,
@@ -323,7 +336,7 @@ button {
 
     .app {
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(520px, 1fr);
+        grid-template-rows: auto minmax(580px, 1fr);
         min-height: 100%;
     }
 
