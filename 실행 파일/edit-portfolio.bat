@@ -1,6 +1,16 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if not exist "admin.html" (
+    cd ..
+)
+if not exist "admin.html" (
+    echo Could not find admin.html.
+    echo Put this file inside the Spine-Viewer folder or one folder below it.
+    echo.
+    pause
+    exit /b 1
+)
 set PORT=8001
 
 :find_port

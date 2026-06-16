@@ -1,6 +1,16 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if not exist "data\portfolio.json" (
+    cd ..
+)
+if not exist "data\portfolio.json" (
+    echo Could not find data\portfolio.json.
+    echo Put this file inside the Spine-Viewer folder or one folder below it.
+    echo.
+    pause
+    exit /b 1
+)
 
 echo Checking portfolio data changes...
 git status --porcelain -- data/portfolio.json > "%TEMP%\spine_portfolio_status.txt"
