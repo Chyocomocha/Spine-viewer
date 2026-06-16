@@ -293,6 +293,23 @@ select {
     border-color: var(--line);
 }
 
+.group-button {
+    cursor: grab;
+}
+
+.group-button:active {
+    cursor: grabbing;
+}
+
+.tree-group.dragging {
+    opacity: 0.55;
+}
+
+.tree-group.drop-target > .group-button {
+    border-color: var(--ok);
+    box-shadow: inset 4px 0 0 var(--ok);
+}
+
 .stack-button.active {
     background: rgba(79, 140, 201, 0.32);
     border-color: var(--accent-strong);
@@ -354,7 +371,8 @@ select {
 
 .selection-summary,
 .quick-guide,
-.work-focus {
+.work-focus,
+.layer-head {
     margin-bottom: 10px;
     padding: 10px 12px;
     border: 1px solid var(--line);
@@ -379,6 +397,23 @@ select {
     border-color: rgba(116, 168, 220, 0.6);
     background: rgba(79, 140, 201, 0.1);
     color: #dcecff;
+}
+
+.layer-head {
+    border-color: rgba(116, 168, 220, 0.6);
+    background: rgba(79, 140, 201, 0.1);
+    color: #dcecff;
+}
+
+.layer-head h2 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.layer-head span {
+    color: var(--muted);
+    font-size: 12px;
 }
 
 .tab-panel {
@@ -463,6 +498,12 @@ select {
     background: var(--input);
     color: var(--text);
     padding: 8px 10px;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+    margin: 0;
 }
 
 textarea {

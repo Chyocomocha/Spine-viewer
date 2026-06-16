@@ -18,12 +18,13 @@ const dom = {
     save: document.getElementById("save-button"),
     siteSettingsToggle: document.getElementById("site-settings-toggle"),
     siteSettingsPanel: document.getElementById("site-settings-panel"),
-    groupSettingsToggle: document.getElementById("group-settings-toggle"),
-    groupSettingsPanel: document.getElementById("group-settings-panel"),
     addCategory: document.getElementById("add-category-button"),
     categoryList: document.getElementById("category-list"),
     addItem: document.getElementById("add-item-button"),
     selectionSummary: document.getElementById("selection-summary"),
+    groupLayer: document.getElementById("group-layer"),
+    groupFocus: document.getElementById("group-focus"),
+    workLayer: document.getElementById("work-layer"),
     workFocus: document.getElementById("work-focus"),
     tabs: document.querySelectorAll(".tab"),
     panels: document.querySelectorAll(".tab-panel"),
@@ -31,8 +32,6 @@ const dom = {
     siteSubtitle: document.getElementById("site-subtitle"),
     siteDescription: document.getElementById("site-description"),
     siteDefault: document.getElementById("site-default"),
-    categoryUp: document.getElementById("category-up-button"),
-    categoryDown: document.getElementById("category-down-button"),
     categoryDelete: document.getElementById("delete-category-button"),
     categoryId: document.getElementById("category-id"),
     categoryTitle: document.getElementById("category-title"),
@@ -61,11 +60,14 @@ const state = {
     portfolio: null,
     categoryIndex: 0,
     itemIndex: 0,
+    selectionMode: "work",
     activeTab: "work",
     dirty: false,
     saveTimer: null,
     saveInFlight: false,
-    pendingSave: false
+    pendingSave: false,
+    dragCategoryIndex: null,
+    suppressNextClick: false
 };
 
 bindEvents();
@@ -85,14 +87,8 @@ function bindEvents() {
 
     dom.siteSettingsToggle.addEventListener("click", () => {
         const shouldOpen = dom.siteSettingsPanel.hidden;
-        setSettingsPanel("site", shouldOpen);
+        setSiteSettingsPanel(shouldOpen);
         setStatus(shouldOpen ? "전체 설정 열림." : "전체 설정 닫힘.", "ok");
-    });
-
-    dom.groupSettingsToggle.addEventListener("click", () => {
-        const shouldOpen = dom.groupSettingsPanel.hidden;
-        setSettingsPanel("group", shouldOpen);
-        setStatus(shouldOpen ? "그룹 관리 열림." : "그룹 관리 닫힘.", "ok");
     });
 
     dom.tabs.forEach(tab => {
@@ -103,17 +99,22 @@ function bindEvents() {
         state.portfolio.categories.push(makeCategory(state.portfolio.categories));
         state.categoryIndex = state.portfolio.categories.length - 1;
         state.itemIndex = 0;
-        setTab("work");
-        setSettingsPanel("group", true);
+        setEditorMode("group");
         markDirty();
         renderAll();
     });
 
     dom.categoryList.addEventListener("click", event => {
+        if (state.suppressNextClick) {
+            state.suppressNextClick = false;
+            return;
+        }
+
         const itemButton = event.target.closest("[data-item-index]");
         if (itemButton) {
             state.categoryIndex = Number(itemButton.dataset.categoryIndex);
             state.itemIndex = Number(itemButton.dataset.itemIndex);
+            setEditorMode("work");
             setTab("work");
             const item = selectedItem();
             setStatus(`작업물 선택됨: ${item?.name || item?.id || "이름 없음"}`, "ok");
@@ -125,24 +126,63 @@ function bindEvents() {
         if (!button) return;
         state.categoryIndex = Number(button.dataset.categoryIndex);
         state.itemIndex = 0;
-        setTab("work");
+        setEditorMode("group");
         const category = selectedCategory();
-        setStatus(`그룹 선택됨: ${category?.title || category?.id || "이름 없음"}`, "ok");
+        setStatus(`그룹 정보: ${category?.title || category?.id || "이름 없음"}`, "ok");
         renderAll();
     });
+
+    dom.categoryList.addEventListener("dragstart", event => {
+        const button = event.target.closest(".group-button");
+        if (!button) return;
+        state.dragCategoryIndex = Number(button.dataset.categoryIndex);
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", button.dataset.categoryIndex);
+        button.closest(".tree-group")?.classList.add("dragging");
+    });
+
+    dom.categoryList.addEventListener("dragover", event => {
+        if (state.dragCategoryIndex === null) return;
+        const group = event.target.closest(".tree-group");
+        if (!group) return;
+        event.preventDefault();
+        clearDropTargets();
+        group.classList.add("drop-target");
+        event.dataTransfer.dropEffect = "move";
+    });
+
+    dom.categoryList.addEventListener("dragleave", event => {
+        const group = event.target.closest(".tree-group");
+        if (!group || group.contains(event.relatedTarget)) return;
+        group.classList.remove("drop-target");
+    });
+
+    dom.categoryList.addEventListener("drop", event => {
+        if (state.dragCategoryIndex === null) return;
+        const group = event.target.closest(".tree-group");
+        if (!group) return;
+        event.preventDefault();
+
+        const targetButton = group.querySelector(".group-button");
+        const targetIndex = Number(targetButton?.dataset.categoryIndex);
+        moveCategoryToIndex(state.dragCategoryIndex, targetIndex);
+        state.suppressNextClick = true;
+        clearDragState();
+    });
+
+    dom.categoryList.addEventListener("dragend", clearDragState);
 
     dom.addItem.addEventListener("click", () => {
         const category = selectedCategory();
         if (!category) return;
         category.items.push(makeItem(flattenItems(state.portfolio, { includeHidden: true })));
         state.itemIndex = category.items.length - 1;
+        setEditorMode("work");
         setTab("work");
         markDirty();
         renderAll();
     });
 
-    dom.categoryUp.addEventListener("click", () => moveCategory(-1));
-    dom.categoryDown.addEventListener("click", () => moveCategory(1));
     dom.categoryDelete.addEventListener("click", deleteCategory);
     dom.itemUp.addEventListener("click", () => moveItem(-1));
     dom.itemDown.addEventListener("click", () => moveItem(1));
@@ -164,6 +204,7 @@ function bindEvents() {
         category.id = value;
         renderCategoryList();
         renderSelectionSummary();
+        renderGroupFocus();
     });
     bindInput(dom.categoryTitle, value => {
         const category = selectedCategory();
@@ -171,6 +212,7 @@ function bindEvents() {
         category.title = value;
         renderCategoryList();
         renderSelectionSummary();
+        renderGroupFocus();
     });
     bindInput(dom.categoryDescription, value => {
         const category = selectedCategory();
@@ -272,6 +314,7 @@ async function reloadPortfolio(keepStatus) {
         state.portfolio = await loadPortfolio();
         state.categoryIndex = 0;
         state.itemIndex = 0;
+        state.selectionMode = "work";
         state.dirty = false;
         state.pendingSave = false;
         renderAll();
@@ -333,6 +376,7 @@ async function savePortfolio(options = {}) {
 
 function renderAll() {
     ensureSelection();
+    renderEditorMode();
     renderSelectionSummary();
     renderSiteForm();
     renderCategoryList();
@@ -370,6 +414,7 @@ function renderCategoryList() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "stack-button group-button";
+        button.draggable = true;
         button.dataset.categoryIndex = String(index);
         button.classList.toggle("active", index === state.categoryIndex);
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
@@ -407,9 +452,8 @@ function renderCategoryList() {
 
 function renderCategoryForm() {
     const category = selectedCategory();
+    renderGroupFocus();
     setControlsDisabled([
-        dom.categoryUp,
-        dom.categoryDown,
         dom.categoryDelete,
         dom.addItem,
         dom.categoryId,
@@ -533,18 +577,20 @@ function setTab(tabName) {
     dom.panels.forEach(panel => panel.classList.toggle("active", panel.id === `${tabName}-panel`));
 }
 
-function setSettingsPanel(panelName, open) {
-    const panels = {
-        site: [dom.siteSettingsPanel, dom.siteSettingsToggle],
-        group: [dom.groupSettingsPanel, dom.groupSettingsToggle]
-    };
+function setSiteSettingsPanel(open) {
+    dom.siteSettingsPanel.hidden = !open;
+    dom.siteSettingsToggle.setAttribute("aria-expanded", String(open));
+    dom.siteSettingsToggle.classList.toggle("active", open);
+}
 
-    Object.entries(panels).forEach(([name, [panel, toggle]]) => {
-        const isOpen = name === panelName && open;
-        panel.hidden = !isOpen;
-        toggle.setAttribute("aria-expanded", String(isOpen));
-        toggle.classList.toggle("active", isOpen);
-    });
+function setEditorMode(mode) {
+    state.selectionMode = mode;
+    renderEditorMode();
+}
+
+function renderEditorMode() {
+    dom.groupLayer.hidden = state.selectionMode !== "group";
+    dom.workLayer.hidden = state.selectionMode !== "work";
 }
 
 function selectedCategory() {
@@ -565,8 +611,20 @@ function renderSelectionSummary() {
     }
 
     const categoryName = category.title || category.id || "이름 없는 그룹";
+    if (state.selectionMode === "group") {
+        dom.selectionSummary.textContent = `현재 그룹: ${categoryName}`;
+        return;
+    }
+
     const itemName = item ? item.name || item.id || "이름 없는 작업물" : "작업물 없음";
     dom.selectionSummary.textContent = `현재 선택: ${categoryName} / ${itemName}`;
+}
+
+function renderGroupFocus() {
+    const category = selectedCategory();
+    dom.groupFocus.textContent = category
+        ? `${category.title || category.id || "이름 없는 그룹"} 정보 편집 중`
+        : "왼쪽에서 그룹을 선택하면 정보를 편집할 수 있습니다.";
 }
 
 function renderWorkFocus() {
@@ -592,14 +650,33 @@ function ensureSelection() {
     state.itemIndex = clamp(state.itemIndex, 0, category.items.length - 1);
 }
 
-function moveCategory(direction) {
+function moveCategoryToIndex(fromIndex, toIndex) {
     const categories = state.portfolio.categories;
-    const nextIndex = state.categoryIndex + direction;
-    if (nextIndex < 0 || nextIndex >= categories.length) return;
-    [categories[state.categoryIndex], categories[nextIndex]] = [categories[nextIndex], categories[state.categoryIndex]];
-    state.categoryIndex = nextIndex;
+    if (!Number.isInteger(fromIndex) || !Number.isInteger(toIndex)) return;
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= categories.length || toIndex >= categories.length) return;
+
+    const [movedCategory] = categories.splice(fromIndex, 1);
+    categories.splice(toIndex, 0, movedCategory);
+    state.categoryIndex = toIndex;
+    state.itemIndex = 0;
+    setEditorMode("group");
     markDirty();
     renderAll();
+    setStatus(`그룹 순서 변경됨: ${movedCategory.title || movedCategory.id || "이름 없음"}`, "ok");
+}
+
+function clearDropTargets() {
+    dom.categoryList.querySelectorAll(".drop-target").forEach(group => {
+        group.classList.remove("drop-target");
+    });
+}
+
+function clearDragState() {
+    state.dragCategoryIndex = null;
+    dom.categoryList.querySelectorAll(".dragging").forEach(group => {
+        group.classList.remove("dragging");
+    });
+    clearDropTargets();
 }
 
 function deleteCategory() {
@@ -699,8 +776,6 @@ function updateButtons(validation) {
     const category = selectedCategory();
     const item = selectedItem();
     dom.save.disabled = nextValidation.errors.length > 0 || state.saveInFlight;
-    dom.categoryUp.disabled = !category || state.categoryIndex === 0;
-    dom.categoryDown.disabled = !category || state.categoryIndex >= state.portfolio.categories.length - 1;
     dom.categoryDelete.disabled = !category;
     dom.itemUp.disabled = !item || state.itemIndex === 0;
     dom.itemDown.disabled = !item || !category || state.itemIndex >= category.items.length - 1;

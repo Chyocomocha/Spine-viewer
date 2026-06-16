@@ -17,7 +17,6 @@
         </div>
         <div class="topbar-actions">
             <button class="button secondary" id="site-settings-toggle" type="button" aria-expanded="false" aria-controls="site-settings-panel">전체 설정</button>
-            <button class="button secondary" id="group-settings-toggle" type="button" aria-expanded="false" aria-controls="group-settings-panel">그룹 관리</button>
             <a class="button secondary" href="./index.html">보기</a>
             <button class="button secondary" id="reload-button" type="button">다시 불러오기</button>
             <button class="button primary" id="save-button" type="button">지금 저장</button>
@@ -54,36 +53,6 @@
         </div>
     </section>
 
-    <section class="settings-panel group-settings-panel" id="group-settings-panel" aria-label="Group settings" hidden>
-        <div class="settings-head">
-            <h2>그룹 관리</h2>
-            <span>왼쪽에서 선택된 그룹의 이름, 설명, 순서를 수정합니다.</span>
-        </div>
-        <div class="section-actions">
-            <button class="button compact" id="category-up-button" type="button">위로</button>
-            <button class="button compact" id="category-down-button" type="button">아래로</button>
-            <button class="button danger compact" id="delete-category-button" type="button">그룹 삭제</button>
-        </div>
-        <div class="form-grid">
-            <label class="field">
-                <span>ID</span>
-                <input id="category-id" type="text" spellcheck="false">
-            </label>
-            <label class="field">
-                <span>그룹 이름</span>
-                <input id="category-title" type="text">
-            </label>
-            <label class="field wide">
-                <span>그룹 설명</span>
-                <textarea id="category-description" rows="4"></textarea>
-            </label>
-            <label class="check-field">
-                <input id="category-hidden" type="checkbox">
-                <span>공개 페이지에서 숨김</span>
-            </label>
-        </div>
-    </section>
-
     <section class="workspace">
         <aside class="list-pane" aria-label="Groups">
             <div class="pane-head">
@@ -98,75 +67,106 @@
 
         <section class="editor-pane" aria-label="Editor">
             <div class="selection-summary" id="selection-summary"></div>
-            <div class="quick-guide">왼쪽에서 작업물/캐릭터를 클릭하면 여기서 바로 설명을 편집합니다.</div>
-            <div class="tabs" role="tablist" aria-label="Edit sections">
-                <button class="tab active" type="button" data-tab="work">작업물/캐릭터 설명</button>
-                <button class="tab" type="button" data-tab="json">데이터 확인</button>
-            </div>
+            <div class="quick-guide">그룹 헤더를 누르면 그룹 정보, 작업물/캐릭터를 누르면 설명 편집이 열립니다. 그룹 순서는 왼쪽 그룹 헤더를 드래그해서 바꿉니다.</div>
 
-            <section class="tab-panel active" id="work-panel">
-                <div class="work-focus" id="work-focus"></div>
-                <div class="section-actions">
-                    <button class="button compact" id="item-up-button" type="button">위로</button>
-                    <button class="button compact" id="item-down-button" type="button">아래로</button>
-                    <button class="button danger compact" id="delete-item-button" type="button">작업물 삭제</button>
+            <section class="editor-layer group-layer" id="group-layer" hidden>
+                <div class="layer-head">
+                    <h2>그룹 정보</h2>
+                    <span id="group-focus"></span>
                 </div>
-                <div class="form-grid work-description-grid">
-                    <label class="field wide primary-field">
-                        <span>플레이어 아래 설명</span>
-                        <textarea id="item-description" rows="5" placeholder="이 작업물에 대한 설명을 입력하세요. 공개 페이지에서 플레이어 아래에 표시됩니다."></textarea>
+                <div class="section-actions">
+                    <button class="button danger compact" id="delete-category-button" type="button">그룹 삭제</button>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>그룹 이름</span>
+                        <input id="category-title" type="text">
+                    </label>
+                    <label class="field">
+                        <span>ID (고급)</span>
+                        <input id="category-id" type="text" spellcheck="false">
+                    </label>
+                    <label class="field wide">
+                        <span>그룹 설명</span>
+                        <textarea id="category-description" rows="4"></textarea>
+                    </label>
+                    <label class="check-field">
+                        <input id="category-hidden" type="checkbox">
+                        <span>공개 페이지에서 숨김</span>
                     </label>
                 </div>
-                <details class="advanced-details">
-                    <summary>작업물 정보 바꾸기</summary>
-                    <div class="form-grid details-grid">
-                        <label class="field">
-                            <span>작업물 이름</span>
-                            <input id="item-name" type="text">
-                        </label>
-                        <label class="field">
-                            <span>표시 배지</span>
-                            <input id="item-badge" type="text">
-                        </label>
-                        <label class="field">
-                            <span>HTML 파일</span>
-                            <input id="item-file" type="text" spellcheck="false">
-                        </label>
-                        <label class="field">
-                            <span>소속 그룹</span>
-                            <select id="item-category"></select>
-                        </label>
-                        <label class="field">
-                            <span>역할</span>
-                            <input id="item-role" type="text">
-                        </label>
-                        <label class="field">
-                            <span>연도</span>
-                            <input id="item-year" type="text">
-                        </label>
-                        <label class="field wide">
-                            <span>태그</span>
-                            <input id="item-tags" type="text">
-                        </label>
-                        <label class="field">
-                            <span>ID (고급)</span>
-                            <input id="item-id" type="text" spellcheck="false">
-                        </label>
-                        <label class="check-field">
-                            <input id="item-hidden" type="checkbox">
-                            <span>공개 페이지에서 숨김</span>
-                        </label>
-                    </div>
-                </details>
-                <div class="links-head">
-                    <h3>링크</h3>
-                    <button class="button compact" id="add-link-button" type="button">링크 추가</button>
-                </div>
-                <div class="links-list" id="links-list"></div>
             </section>
 
-            <section class="tab-panel" id="json-panel">
-                <textarea class="json-preview" id="json-preview" readonly spellcheck="false"></textarea>
+            <section class="editor-layer work-layer" id="work-layer">
+                <div class="tabs" role="tablist" aria-label="Edit sections">
+                    <button class="tab active" type="button" data-tab="work">작업물/캐릭터 설명</button>
+                    <button class="tab" type="button" data-tab="json">데이터 확인</button>
+                </div>
+
+                <section class="tab-panel active" id="work-panel">
+                    <div class="work-focus" id="work-focus"></div>
+                    <div class="section-actions">
+                        <button class="button compact" id="item-up-button" type="button">위로</button>
+                        <button class="button compact" id="item-down-button" type="button">아래로</button>
+                        <button class="button danger compact" id="delete-item-button" type="button">작업물 삭제</button>
+                    </div>
+                    <div class="form-grid work-description-grid">
+                        <label class="field wide primary-field">
+                            <span>플레이어 아래 설명</span>
+                            <textarea id="item-description" rows="5" placeholder="이 작업물에 대한 설명을 입력하세요. 공개 페이지에서 플레이어 아래에 표시됩니다."></textarea>
+                        </label>
+                    </div>
+                    <details class="advanced-details">
+                        <summary>작업물 정보 바꾸기</summary>
+                        <div class="form-grid details-grid">
+                            <label class="field">
+                                <span>작업물 이름</span>
+                                <input id="item-name" type="text">
+                            </label>
+                            <label class="field">
+                                <span>표시 배지</span>
+                                <input id="item-badge" type="text">
+                            </label>
+                            <label class="field">
+                                <span>HTML 파일</span>
+                                <input id="item-file" type="text" spellcheck="false">
+                            </label>
+                            <label class="field">
+                                <span>소속 그룹</span>
+                                <select id="item-category"></select>
+                            </label>
+                            <label class="field">
+                                <span>역할</span>
+                                <input id="item-role" type="text">
+                            </label>
+                            <label class="field">
+                                <span>연도</span>
+                                <input id="item-year" type="text">
+                            </label>
+                            <label class="field wide">
+                                <span>태그</span>
+                                <input id="item-tags" type="text">
+                            </label>
+                            <label class="field">
+                                <span>ID (고급)</span>
+                                <input id="item-id" type="text" spellcheck="false">
+                            </label>
+                            <label class="check-field">
+                                <input id="item-hidden" type="checkbox">
+                                <span>공개 페이지에서 숨김</span>
+                            </label>
+                        </div>
+                    </details>
+                    <div class="links-head">
+                        <h3>링크</h3>
+                        <button class="button compact" id="add-link-button" type="button">링크 추가</button>
+                    </div>
+                    <div class="links-list" id="links-list"></div>
+                </section>
+
+                <section class="tab-panel" id="json-panel">
+                    <textarea class="json-preview" id="json-preview" readonly spellcheck="false"></textarea>
+                </section>
             </section>
         </section>
 
