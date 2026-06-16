@@ -187,78 +187,6 @@ button {
     white-space: nowrap;
 }
 
-.current-description {
-    max-width: 1120px;
-    margin: 0;
-    color: #d7d7d7;
-    font-size: 13px;
-    line-height: 1.45;
-    white-space: pre-wrap;
-}
-
-.current-meta:empty,
-.current-tags:empty,
-.current-links:empty {
-    display: none;
-}
-
-.current-description.empty {
-    color: #777;
-}
-
-.current-meta,
-.current-tags,
-.current-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.work-detail {
-    z-index: 3;
-    grid-row: 2;
-    grid-column: 1;
-    align-self: start;
-    max-height: min(180px, 24vh);
-    overflow: auto;
-    margin: 12px 14px 0;
-    padding: 14px 16px 16px;
-    background: rgba(24, 24, 24, 0.94);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
-}
-
-.meta-pill,
-.tag-pill {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    padding: 4px 8px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.2;
-}
-
-.tag-pill {
-    border-color: rgba(79, 140, 201, 0.45);
-    color: var(--accent-strong);
-}
-
-.work-link {
-    color: var(--accent-strong);
-    font-size: 12px;
-    line-height: 1.2;
-    text-decoration: none;
-}
-
-.work-link:hover {
-    text-decoration: underline;
-}
-
 .toolbar-actions {
     display: flex;
     flex: 0 0 auto;
@@ -299,8 +227,6 @@ button {
 
 .viewer-wrap {
     position: relative;
-    grid-row: 2;
-    grid-column: 1;
     min-width: 0;
     min-height: 0;
     background: #191919;

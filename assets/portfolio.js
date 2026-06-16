@@ -10,10 +10,6 @@ const dom = {
     loading: document.getElementById("loading"),
     currentTitle: document.getElementById("current-title"),
     currentSubtitle: document.getElementById("current-subtitle"),
-    currentDescription: document.getElementById("current-description"),
-    currentMeta: document.getElementById("current-meta"),
-    currentTags: document.getElementById("current-tags"),
-    currentLinks: document.getElementById("current-links"),
     openButton: document.getElementById("open-button"),
     reloadButton: document.getElementById("reload-button"),
     itemCount: document.getElementById("item-count")
@@ -113,47 +109,6 @@ function selectItem(itemId, shouldUpdateUrl) {
 function renderCurrentItem(item) {
     dom.currentTitle.textContent = item.name;
     dom.currentSubtitle.textContent = [item.categoryTitle, item.badge].filter(Boolean).join(" / ");
-    dom.currentDescription.textContent = item.description || "No description yet.";
-    dom.currentDescription.classList.toggle("empty", !item.description);
-    renderMeta(item);
-    renderTags(item.tags);
-    renderLinks(item.links);
-}
-
-function renderMeta(item) {
-    dom.currentMeta.innerHTML = "";
-    [
-        item.role ? `Role: ${item.role}` : "",
-        item.year ? `Year: ${item.year}` : ""
-    ].filter(Boolean).forEach(value => {
-        const pill = document.createElement("span");
-        pill.className = "meta-pill";
-        pill.textContent = value;
-        dom.currentMeta.appendChild(pill);
-    });
-}
-
-function renderTags(tags) {
-    dom.currentTags.innerHTML = "";
-    tags.forEach(tag => {
-        const pill = document.createElement("span");
-        pill.className = "tag-pill";
-        pill.textContent = tag;
-        dom.currentTags.appendChild(pill);
-    });
-}
-
-function renderLinks(links) {
-    dom.currentLinks.innerHTML = "";
-    links.forEach(link => {
-        const anchor = document.createElement("a");
-        anchor.className = "work-link";
-        anchor.href = link.url;
-        anchor.target = "_blank";
-        anchor.rel = "noopener";
-        anchor.textContent = link.label || link.url;
-        dom.currentLinks.appendChild(anchor);
-    });
 }
 
 function setActiveButton(itemId) {
@@ -226,10 +181,6 @@ function renderFatalError(error) {
     disableActions(true);
     dom.currentTitle.textContent = "Portfolio data error";
     dom.currentSubtitle.textContent = "";
-    dom.currentDescription.textContent = "";
-    dom.currentMeta.innerHTML = "";
-    dom.currentTags.innerHTML = "";
-    dom.currentLinks.innerHTML = "";
     dom.itemCount.textContent = "";
     dom.nav.innerHTML = "";
     setLoading(`${error.message}\nCheck data/portfolio.json and open this page through GitHub Pages or a local server.`, true);
