@@ -17,6 +17,7 @@
         </div>
         <div class="topbar-actions">
             <button class="button secondary" id="site-settings-toggle" type="button" aria-expanded="false" aria-controls="site-settings-panel">전체 설정</button>
+            <button class="button secondary" id="group-settings-toggle" type="button" aria-expanded="false" aria-controls="group-settings-panel">그룹 관리</button>
             <a class="button secondary" href="./index.html">보기</a>
             <button class="button secondary" id="reload-button" type="button">다시 불러오기</button>
             <button class="button primary" id="save-button" type="button">지금 저장</button>
@@ -28,7 +29,7 @@
         <div class="status" id="status"></div>
     </section>
 
-    <section class="site-settings-panel" id="site-settings-panel" aria-label="Site settings" hidden>
+    <section class="settings-panel site-settings-panel" id="site-settings-panel" aria-label="Site settings" hidden>
         <div class="settings-head">
             <h2>전체 설정</h2>
             <span>포트폴리오 전체 제목, 소개, 처음 열 작업물만 여기서 수정합니다.</span>
@@ -53,6 +54,36 @@
         </div>
     </section>
 
+    <section class="settings-panel group-settings-panel" id="group-settings-panel" aria-label="Group settings" hidden>
+        <div class="settings-head">
+            <h2>그룹 관리</h2>
+            <span>왼쪽에서 선택된 그룹의 이름, 설명, 순서를 수정합니다.</span>
+        </div>
+        <div class="section-actions">
+            <button class="button compact" id="category-up-button" type="button">위로</button>
+            <button class="button compact" id="category-down-button" type="button">아래로</button>
+            <button class="button danger compact" id="delete-category-button" type="button">그룹 삭제</button>
+        </div>
+        <div class="form-grid">
+            <label class="field">
+                <span>ID</span>
+                <input id="category-id" type="text" spellcheck="false">
+            </label>
+            <label class="field">
+                <span>그룹 이름</span>
+                <input id="category-title" type="text">
+            </label>
+            <label class="field wide">
+                <span>그룹 설명</span>
+                <textarea id="category-description" rows="4"></textarea>
+            </label>
+            <label class="check-field">
+                <input id="category-hidden" type="checkbox">
+                <span>공개 페이지에서 숨김</span>
+            </label>
+        </div>
+    </section>
+
     <section class="workspace">
         <aside class="list-pane" aria-label="Groups">
             <div class="pane-head">
@@ -69,36 +100,9 @@
             <div class="selection-summary" id="selection-summary"></div>
             <div class="quick-guide">왼쪽에서 작업물/캐릭터를 클릭하면 여기서 바로 설명을 편집합니다.</div>
             <div class="tabs" role="tablist" aria-label="Edit sections">
-                <button class="tab" type="button" data-tab="category">그룹 편집</button>
                 <button class="tab active" type="button" data-tab="work">작업물/캐릭터 설명</button>
                 <button class="tab" type="button" data-tab="json">데이터 확인</button>
             </div>
-
-            <section class="tab-panel" id="category-panel">
-                <div class="section-actions">
-                    <button class="button compact" id="category-up-button" type="button">위로</button>
-                    <button class="button compact" id="category-down-button" type="button">아래로</button>
-                    <button class="button danger compact" id="delete-category-button" type="button">그룹 삭제</button>
-                </div>
-                <div class="form-grid">
-                    <label class="field">
-                        <span>ID</span>
-                        <input id="category-id" type="text" spellcheck="false">
-                    </label>
-                    <label class="field">
-                        <span>그룹 이름</span>
-                        <input id="category-title" type="text">
-                    </label>
-                    <label class="field wide">
-                        <span>그룹 설명</span>
-                        <textarea id="category-description" rows="4"></textarea>
-                    </label>
-                    <label class="check-field">
-                        <input id="category-hidden" type="checkbox">
-                        <span>공개 페이지에서 숨김</span>
-                    </label>
-                </div>
-            </section>
 
             <section class="tab-panel active" id="work-panel">
                 <div class="work-focus" id="work-focus"></div>

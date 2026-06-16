@@ -18,6 +18,8 @@ const dom = {
     save: document.getElementById("save-button"),
     siteSettingsToggle: document.getElementById("site-settings-toggle"),
     siteSettingsPanel: document.getElementById("site-settings-panel"),
+    groupSettingsToggle: document.getElementById("group-settings-toggle"),
+    groupSettingsPanel: document.getElementById("group-settings-panel"),
     addCategory: document.getElementById("add-category-button"),
     categoryList: document.getElementById("category-list"),
     addItem: document.getElementById("add-item-button"),
@@ -83,10 +85,14 @@ function bindEvents() {
 
     dom.siteSettingsToggle.addEventListener("click", () => {
         const shouldOpen = dom.siteSettingsPanel.hidden;
-        dom.siteSettingsPanel.hidden = !shouldOpen;
-        dom.siteSettingsToggle.setAttribute("aria-expanded", String(shouldOpen));
-        dom.siteSettingsToggle.classList.toggle("active", shouldOpen);
+        setSettingsPanel("site", shouldOpen);
         setStatus(shouldOpen ? "전체 설정 열림." : "전체 설정 닫힘.", "ok");
+    });
+
+    dom.groupSettingsToggle.addEventListener("click", () => {
+        const shouldOpen = dom.groupSettingsPanel.hidden;
+        setSettingsPanel("group", shouldOpen);
+        setStatus(shouldOpen ? "그룹 관리 열림." : "그룹 관리 닫힘.", "ok");
     });
 
     dom.tabs.forEach(tab => {
@@ -97,7 +103,8 @@ function bindEvents() {
         state.portfolio.categories.push(makeCategory(state.portfolio.categories));
         state.categoryIndex = state.portfolio.categories.length - 1;
         state.itemIndex = 0;
-        setTab("category");
+        setTab("work");
+        setSettingsPanel("group", true);
         markDirty();
         renderAll();
     });
@@ -118,7 +125,7 @@ function bindEvents() {
         if (!button) return;
         state.categoryIndex = Number(button.dataset.categoryIndex);
         state.itemIndex = 0;
-        setTab("category");
+        setTab("work");
         const category = selectedCategory();
         setStatus(`그룹 선택됨: ${category?.title || category?.id || "이름 없음"}`, "ok");
         renderAll();
@@ -524,6 +531,20 @@ function setTab(tabName) {
     state.activeTab = tabName;
     dom.tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.tab === tabName));
     dom.panels.forEach(panel => panel.classList.toggle("active", panel.id === `${tabName}-panel`));
+}
+
+function setSettingsPanel(panelName, open) {
+    const panels = {
+        site: [dom.siteSettingsPanel, dom.siteSettingsToggle],
+        group: [dom.groupSettingsPanel, dom.groupSettingsToggle]
+    };
+
+    Object.entries(panels).forEach(([name, [panel, toggle]]) => {
+        const isOpen = name === panelName && open;
+        panel.hidden = !isOpen;
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        toggle.classList.toggle("active", isOpen);
+    });
 }
 
 function selectedCategory() {

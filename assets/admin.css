@@ -194,7 +194,7 @@ select {
     line-height: 1.35;
 }
 
-.site-settings-panel {
+.settings-panel {
     padding: 14px 16px 16px;
     border-bottom: 1px solid var(--line);
     background: #181818;
