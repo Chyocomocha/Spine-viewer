@@ -30,6 +30,6 @@ echo Close this window when you are done.
 echo.
 
 start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Sleep -Seconds 2; Start-Process 'http://127.0.0.1:%PORT%/admin.html'"
-python -m http.server %PORT% --bind 127.0.0.1
+python "%~dp0local_editor_server.py" %PORT%
 
 pause

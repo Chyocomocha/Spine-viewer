@@ -5,13 +5,14 @@ import {
     loadPortfolio,
     makeCategory,
     makeItem,
-    normalizePortfolio,
     serializePortfolio,
     validatePortfolio
 } from "./portfolio-data.js";
 
+const SAVE_ENDPOINT = "./__portfolio/save";
+const AUTO_SAVE_DELAY_MS = 700;
+
 const dom = {
-    chooseFile: document.getElementById("choose-file-button"),
     status: document.getElementById("status"),
     reload: document.getElementById("reload-button"),
     save: document.getElementById("save-button"),
@@ -57,7 +58,9 @@ const state = {
     itemIndex: 0,
     activeTab: "site",
     dirty: false,
-    fileHandle: null
+    saveTimer: null,
+    saveInFlight: false,
+    pendingSave: false
 };
 
 bindEvents();
@@ -68,13 +71,12 @@ async function init() {
 }
 
 function bindEvents() {
-    dom.chooseFile.addEventListener("click", chooseDataFile);
     dom.reload.addEventListener("click", async () => {
         if (state.dirty && !window.confirm("Discard unsaved changes?")) return;
         await reloadPortfolio(false);
     });
 
-    dom.save.addEventListener("click", savePortfolio);
+    dom.save.addEventListener("click", () => savePortfolio({ manual: true }));
 
     dom.tabs.forEach(tab => {
         tab.addEventListener("click", () => setTab(tab.dataset.tab));
@@ -235,98 +237,68 @@ function bindEvents() {
 
 async function reloadPortfolio(keepStatus) {
     try {
+        window.clearTimeout(state.saveTimer);
         setStatus("Loading data...", "");
-        state.portfolio = state.fileHandle
-            ? normalizePortfolio(JSON.parse(await (await state.fileHandle.getFile()).text()))
-            : await loadPortfolio();
+        state.portfolio = await loadPortfolio();
         state.categoryIndex = 0;
         state.itemIndex = 0;
         state.dirty = false;
+        state.pendingSave = false;
         renderAll();
-        if (!keepStatus) setStatus("Data loaded.", "ok");
+        if (!keepStatus) setStatus("Auto save ready.", "ok");
     } catch (error) {
         console.error(error);
         setStatus(error.message, "error");
     }
 }
 
-async function savePortfolio() {
+async function savePortfolio(options = {}) {
+    if (!state.portfolio) return;
+
+    window.clearTimeout(state.saveTimer);
     const validation = validatePortfolio(state.portfolio);
     if (validation.errors.length) {
-        setStatus("Fix validation errors before saving.", "error");
+        setStatus("Fix validation errors. Auto save paused.", "error");
         renderValidation();
         return;
     }
 
+    if (state.saveInFlight) {
+        state.pendingSave = true;
+        return;
+    }
+
     try {
-        dom.save.disabled = true;
-        setStatus("Saving local file...", "");
-        await saveLocalPortfolio();
+        state.saveInFlight = true;
+        updateButtons(validation);
+        setStatus(options.manual ? "Saving..." : "Auto saving...", "");
+
+        const response = await fetch(SAVE_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: serializePortfolio(state.portfolio)
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(payload.error || "Auto save failed. Start editor with edit-portfolio.bat.");
+        }
+
         state.dirty = false;
-        setStatus("Saved locally. Run publish-portfolio.bat to publish.", "ok");
+        setStatus("Auto saved to data/portfolio.json.", "ok");
         renderValidation();
     } catch (error) {
         console.error(error);
         setStatus(error.message, "error");
         renderValidation();
     } finally {
+        state.saveInFlight = false;
         updateButtons();
-    }
-}
-
-async function chooseDataFile() {
-    if (!supportsFileSystemAccess()) {
-        setStatus("This browser cannot write local files directly. Use Microsoft Edge or Chrome.", "error");
-        return;
-    }
-    if (state.dirty && !window.confirm("Discard unsaved changes and reload the selected file?")) return;
-
-    try {
-        state.fileHandle = await pickPortfolioFile();
-        await reloadPortfolio(true);
-        setStatus(`Using ${state.fileHandle.name}.`, "ok");
-    } catch (error) {
-        if (error.name === "AbortError") return;
-        console.error(error);
-        setStatus(error.message, "error");
-    }
-}
-
-async function saveLocalPortfolio() {
-    if (!state.fileHandle) {
-        if (!supportsFileSystemAccess()) {
-            downloadPortfolioJson();
-            setStatus("Downloaded portfolio.json. Replace data/portfolio.json with that file, then publish.", "ok");
-            return;
+        if (state.pendingSave) {
+            state.pendingSave = false;
+            scheduleAutoSave(100);
         }
-        state.fileHandle = await pickPortfolioFile();
-        if (!state.fileHandle) throw new Error("Choose data/portfolio.json before saving.");
     }
-
-    const writable = await state.fileHandle.createWritable();
-    await writable.write(serializePortfolio(state.portfolio));
-    await writable.close();
-}
-
-async function pickPortfolioFile() {
-    const [handle] = await window.showOpenFilePicker({
-        multiple: false,
-        types: [{
-            description: "Portfolio JSON",
-            accept: { "application/json": [".json"] }
-        }]
-    });
-    return handle;
-}
-
-function downloadPortfolioJson() {
-    const blob = new Blob([serializePortfolio(state.portfolio)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "portfolio.json";
-    anchor.click();
-    URL.revokeObjectURL(url);
 }
 
 function renderAll() {
@@ -495,16 +467,11 @@ function renderValidation() {
     const validation = validatePortfolio(state.portfolio);
     dom.validationList.innerHTML = "";
 
-    const hasFileHandle = Boolean(state.fileHandle);
-    if (!hasFileHandle) {
-        addValidationMessage("Choose data/portfolio.json before saving.", "warning");
-    }
-
     validation.errors.forEach(message => addValidationMessage(message, "error"));
     validation.warnings.forEach(message => addValidationMessage(message, "warning"));
 
-    if (!validation.errors.length && !validation.warnings.length && hasFileHandle) {
-        addValidationMessage(state.fileHandle ? "Ready to save locally." : "Ready. Save will ask for data/portfolio.json.", "ok");
+    if (!validation.errors.length && !validation.warnings.length) {
+        addValidationMessage(state.dirty ? "Auto save pending." : "Auto save ready.", "ok");
     }
 
     updateButtons(validation);
@@ -634,8 +601,14 @@ function bindInput(input, updater) {
 function markDirty() {
     state.dirty = true;
     if (!dom.status.classList.contains("error")) {
-        setStatus("Unsaved changes.", "");
+        setStatus("Unsaved changes. Auto save pending...", "");
     }
+    scheduleAutoSave();
+}
+
+function scheduleAutoSave(delay = AUTO_SAVE_DELAY_MS) {
+    window.clearTimeout(state.saveTimer);
+    state.saveTimer = window.setTimeout(() => savePortfolio(), delay);
 }
 
 function updateButtons(validation) {
@@ -645,11 +618,9 @@ function updateButtons(validation) {
     }
 
     const nextValidation = validation || validatePortfolio(state.portfolio);
-    const hasErrors = nextValidation.errors.length > 0;
-    dom.save.disabled = hasErrors;
-
     const category = selectedCategory();
     const item = selectedItem();
+    dom.save.disabled = nextValidation.errors.length > 0 || state.saveInFlight;
     dom.categoryUp.disabled = !category || state.categoryIndex === 0;
     dom.categoryDown.disabled = !category || state.categoryIndex >= state.portfolio.categories.length - 1;
     dom.categoryDelete.disabled = !category;
@@ -675,8 +646,4 @@ function splitTags(value) {
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
-}
-
-function supportsFileSystemAccess() {
-    return typeof window.showOpenFilePicker === "function";
 }
