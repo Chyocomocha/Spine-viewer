@@ -6,9 +6,10 @@ GitHub Pages용 정적 Spine 포트폴리오입니다.
 
 1. `실행 파일\edit-portfolio.bat`를 더블클릭합니다.
 2. 열린 관리자 화면에서 제목, 카테고리, 작품 이름, 설명, 순서를 수정합니다.
-3. 수정하면 자동으로 `data\portfolio.json`에 저장됩니다.
-4. 브라우저와 서버 창을 닫습니다.
-5. `실행 파일\publish-portfolio.bat`를 더블클릭합니다.
+3. 버튼별 역할이 헷갈리면 관리자 상단의 `사용 설명서`를 엽니다.
+4. 수정하면 자동으로 `data\portfolio.json`에 저장됩니다.
+5. 브라우저와 서버 창을 닫습니다.
+6. `실행 파일\publish-portfolio.bat`를 더블클릭합니다.
 
 `publish-portfolio.bat`가 `data\portfolio.json` 변경분을 커밋하고 GitHub로 push합니다.
 GitHub Pages에는 push 후 잠시 뒤 자동 반영됩니다.
@@ -17,7 +18,7 @@ GitHub Pages에는 push 후 잠시 뒤 자동 반영됩니다.
 
 - 사이트 제목, 부제목, 설명
 - 처음 열 작품
-- 카테고리 추가, 삭제, 숨김, 이름 수정, 순서 변경
+- 카테고리 추가, 삭제, 숨김, 이름 수정
 - 작품 추가, 삭제, 숨김, 이름 수정, 카테고리 이동, 순서 변경
 - 작품 설명, 역할, 연도, 태그, 링크
 
@@ -25,6 +26,7 @@ GitHub Pages에는 push 후 잠시 뒤 자동 반영됩니다.
 
 - 공개 페이지: `index.html`
 - 관리자 페이지: `admin.html`
+- 아티스트용 사용 설명서: `artist-guide.html`
 - 포트폴리오 데이터: `data\portfolio.json`
 - 실행용 배치 파일: `실행 파일\`
 - 로컬 자동 저장 서버: `실행 파일\local_editor_server.py`
