@@ -16,9 +16,10 @@ const dom = {
     status: document.getElementById("status"),
     reload: document.getElementById("reload-button"),
     save: document.getElementById("save-button"),
+    siteSettingsToggle: document.getElementById("site-settings-toggle"),
+    siteSettingsPanel: document.getElementById("site-settings-panel"),
     addCategory: document.getElementById("add-category-button"),
     categoryList: document.getElementById("category-list"),
-    itemList: document.getElementById("item-list"),
     addItem: document.getElementById("add-item-button"),
     selectionSummary: document.getElementById("selection-summary"),
     workFocus: document.getElementById("work-focus"),
@@ -58,7 +59,7 @@ const state = {
     portfolio: null,
     categoryIndex: 0,
     itemIndex: 0,
-    activeTab: "site",
+    activeTab: "work",
     dirty: false,
     saveTimer: null,
     saveInFlight: false,
@@ -80,6 +81,14 @@ function bindEvents() {
 
     dom.save.addEventListener("click", () => savePortfolio({ manual: true }));
 
+    dom.siteSettingsToggle.addEventListener("click", () => {
+        const shouldOpen = dom.siteSettingsPanel.hidden;
+        dom.siteSettingsPanel.hidden = !shouldOpen;
+        dom.siteSettingsToggle.setAttribute("aria-expanded", String(shouldOpen));
+        dom.siteSettingsToggle.classList.toggle("active", shouldOpen);
+        setStatus(shouldOpen ? "전체 설정 열림." : "전체 설정 닫힘.", "ok");
+    });
+
     dom.tabs.forEach(tab => {
         tab.addEventListener("click", () => setTab(tab.dataset.tab));
     });
@@ -94,6 +103,17 @@ function bindEvents() {
     });
 
     dom.categoryList.addEventListener("click", event => {
+        const itemButton = event.target.closest("[data-item-index]");
+        if (itemButton) {
+            state.categoryIndex = Number(itemButton.dataset.categoryIndex);
+            state.itemIndex = Number(itemButton.dataset.itemIndex);
+            setTab("work");
+            const item = selectedItem();
+            setStatus(`작업물 선택됨: ${item?.name || item?.id || "이름 없음"}`, "ok");
+            renderAll();
+            return;
+        }
+
         const button = event.target.closest("[data-category-index]");
         if (!button) return;
         state.categoryIndex = Number(button.dataset.categoryIndex);
@@ -101,16 +121,6 @@ function bindEvents() {
         setTab("category");
         const category = selectedCategory();
         setStatus(`그룹 선택됨: ${category?.title || category?.id || "이름 없음"}`, "ok");
-        renderAll();
-    });
-
-    dom.itemList.addEventListener("click", event => {
-        const button = event.target.closest("[data-item-index]");
-        if (!button) return;
-        state.itemIndex = Number(button.dataset.itemIndex);
-        setTab("work");
-        const item = selectedItem();
-        setStatus(`작업물 선택됨: ${item?.name || item?.id || "이름 없음"}`, "ok");
         renderAll();
     });
 
@@ -172,7 +182,7 @@ function bindEvents() {
         const item = selectedItem();
         if (!item) return;
         item.id = value;
-        renderItemList();
+        renderCategoryList();
         renderDefaultOptions();
         renderSelectionSummary();
         renderWorkFocus();
@@ -181,7 +191,7 @@ function bindEvents() {
         const item = selectedItem();
         if (!item) return;
         item.name = value;
-        renderItemList();
+        renderCategoryList();
         renderDefaultOptions();
         renderSelectionSummary();
         renderWorkFocus();
@@ -190,7 +200,7 @@ function bindEvents() {
         const item = selectedItem();
         if (!item) return;
         item.badge = value;
-        renderItemList();
+        renderCategoryList();
     });
     bindInput(dom.itemFile, value => {
         const item = selectedItem();
@@ -220,7 +230,7 @@ function bindEvents() {
         if (!item) return;
         item.hidden = dom.itemHidden.checked;
         markDirty();
-        renderItemList();
+        renderCategoryList();
         renderJsonAndValidation();
     });
 
@@ -320,7 +330,6 @@ function renderAll() {
     renderSiteForm();
     renderCategoryList();
     renderCategoryForm();
-    renderItemList();
     renderItemForm();
     renderJsonAndValidation();
 }
@@ -347,15 +356,45 @@ function renderDefaultOptions() {
 function renderCategoryList() {
     dom.categoryList.innerHTML = "";
     state.portfolio.categories.forEach((category, index) => {
+        const group = document.createElement("div");
+        group.className = "tree-group";
+        group.classList.toggle("active-group", index === state.categoryIndex);
+
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "stack-button";
+        button.className = "stack-button group-button";
         button.dataset.categoryIndex = String(index);
         button.classList.toggle("active", index === state.categoryIndex);
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
         button.querySelector(".stack-name").textContent = category.title || "(이름 없음)";
         button.querySelector(".stack-meta").textContent = `${category.items.length}개${category.hidden ? " 숨김" : ""}`;
-        dom.categoryList.appendChild(button);
+        group.appendChild(button);
+
+        const itemList = document.createElement("div");
+        itemList.className = "tree-items";
+
+        if (!category.items.length) {
+            const empty = document.createElement("div");
+            empty.className = "tree-empty";
+            empty.textContent = "작업물 없음";
+            itemList.appendChild(empty);
+        }
+
+        category.items.forEach((item, itemIndex) => {
+            const itemButton = document.createElement("button");
+            itemButton.type = "button";
+            itemButton.className = "item-subbutton";
+            itemButton.dataset.categoryIndex = String(index);
+            itemButton.dataset.itemIndex = String(itemIndex);
+            itemButton.classList.toggle("active", index === state.categoryIndex && itemIndex === state.itemIndex);
+            itemButton.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
+            itemButton.querySelector(".stack-name").textContent = item.name || "(이름 없음)";
+            itemButton.querySelector(".stack-meta").textContent = `${item.badge || item.id}${item.hidden ? " 숨김" : ""}`;
+            itemList.appendChild(itemButton);
+        });
+
+        group.appendChild(itemList);
+        dom.categoryList.appendChild(group);
     });
 }
 
@@ -384,24 +423,6 @@ function renderCategoryForm() {
     dom.categoryTitle.value = category.title;
     dom.categoryDescription.value = category.description;
     dom.categoryHidden.checked = category.hidden;
-}
-
-function renderItemList() {
-    const category = selectedCategory();
-    dom.itemList.innerHTML = "";
-    if (!category) return;
-
-    category.items.forEach((item, index) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "stack-button";
-        button.dataset.itemIndex = String(index);
-        button.classList.toggle("active", index === state.itemIndex);
-        button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
-        button.querySelector(".stack-name").textContent = item.name || "(이름 없음)";
-        button.querySelector(".stack-meta").textContent = `${item.badge || item.id}${item.hidden ? " 숨김" : ""}`;
-        dom.itemList.appendChild(button);
-    });
 }
 
 function renderItemForm() {
@@ -530,8 +551,8 @@ function renderSelectionSummary() {
 function renderWorkFocus() {
     const item = selectedItem();
     dom.workFocus.textContent = item
-        ? `지금 편집 중: ${item.name || item.id || "이름 없는 작업물"} - 아래 설명은 공개 페이지의 플레이어 아래에 표시됩니다.`
-        : "작업물을 선택하면 설명을 편집할 수 있습니다.";
+        ? `${item.name || item.id || "이름 없는 작업물"} 설명 편집 중`
+        : "왼쪽에서 작업물을 선택하면 설명을 편집할 수 있습니다.";
 }
 
 function ensureSelection() {

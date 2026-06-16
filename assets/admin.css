@@ -88,10 +88,16 @@ select {
 .section-actions,
 .links-head,
 .pane-head,
+.pane-actions,
 .tabs {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.pane-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .pane-head,
@@ -132,7 +138,8 @@ select {
 
 .button:focus-visible,
 .tab:focus-visible,
-.stack-button:focus-visible {
+.stack-button:focus-visible,
+.item-subbutton:focus-visible {
     border-color: var(--accent-strong);
     outline: 2px solid rgba(116, 168, 220, 0.55);
     outline-offset: 2px;
@@ -140,13 +147,20 @@ select {
 
 .button:active,
 .tab:active,
-.stack-button:active {
+.stack-button:active,
+.item-subbutton:active {
     transform: translateY(1px);
 }
 
 .button.primary {
     border-color: var(--accent);
     background: rgba(79, 140, 201, 0.25);
+}
+
+.button.active {
+    border-color: var(--accent-strong);
+    background: rgba(79, 140, 201, 0.22);
+    color: #ffffff;
 }
 
 .button.secondary {
@@ -180,9 +194,34 @@ select {
     line-height: 1.35;
 }
 
+.site-settings-panel {
+    padding: 14px 16px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #181818;
+}
+
+.settings-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.settings-head h2 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.settings-head span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
 .workspace {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr) 300px;
+    grid-template-columns: 320px minmax(0, 1fr) 300px;
     gap: 0;
     min-height: calc(100vh - 126px);
 }
@@ -209,10 +248,24 @@ select {
 
 .stack-list {
     display: grid;
-    gap: 6px;
+    gap: 10px;
 }
 
-.stack-button {
+.tree-group {
+    display: grid;
+    gap: 5px;
+}
+
+.tree-items {
+    display: grid;
+    gap: 4px;
+    margin-left: 14px;
+    padding-left: 10px;
+    border-left: 1px solid var(--line);
+}
+
+.stack-button,
+.item-subbutton {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -228,7 +281,14 @@ select {
     cursor: pointer;
 }
 
-.stack-button:hover {
+.item-subbutton {
+    min-height: 32px;
+    padding: 6px 9px;
+    color: #dedede;
+}
+
+.stack-button:hover,
+.item-subbutton:hover {
     background: var(--surface-strong);
     border-color: var(--line);
 }
@@ -237,6 +297,20 @@ select {
     background: rgba(79, 140, 201, 0.32);
     border-color: var(--accent-strong);
     box-shadow: inset 4px 0 0 var(--accent-strong);
+}
+
+.item-subbutton.active {
+    background: rgba(112, 168, 220, 0.22);
+    border-color: rgba(116, 168, 220, 0.75);
+    box-shadow: inset 3px 0 0 var(--accent-strong);
+    color: #ffffff;
+}
+
+.tree-empty {
+    padding: 6px 9px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.3;
 }
 
 .stack-name {
@@ -252,6 +326,11 @@ select {
     color: var(--muted);
     font-size: 11px;
     white-space: nowrap;
+}
+
+.item-subbutton .stack-name {
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .tabs {
@@ -333,6 +412,34 @@ select {
     background: rgba(79, 140, 201, 0.08);
 }
 
+.work-description-grid {
+    margin-bottom: 12px;
+}
+
+.advanced-details {
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.advanced-details summary {
+    min-height: 36px;
+    padding: 9px 12px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.advanced-details[open] summary {
+    border-bottom: 1px solid var(--line);
+}
+
+.details-grid {
+    padding: 12px;
+}
+
 .field span,
 .check-field span {
     color: var(--muted);
@@ -369,12 +476,6 @@ select:focus {
     border-color: var(--accent-strong);
     outline: none;
     box-shadow: 0 0 0 2px rgba(116, 168, 220, 0.16);
-}
-
-.split-editor {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 18px;
 }
 
 .section-actions {
