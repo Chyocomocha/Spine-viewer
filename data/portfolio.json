@@ -296,7 +296,15 @@
           "tags": [],
           "links": [],
           "hidden": false
-        },
+        }
+      ]
+    },
+    {
+      "id": "personal-projects",
+      "title": "Personal Projects",
+      "description": "Personal projects using AI resources\nUse ComfyUI",
+      "hidden": false,
+      "items": [
         {
           "id": "girl",
           "name": "Girl Character",
