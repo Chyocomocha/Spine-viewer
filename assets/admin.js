@@ -364,6 +364,33 @@ function renderCategoryList() {
         group.className = "tree-group";
         group.classList.toggle("active-group", index === state.categoryIndex);
 
+        group.addEventListener("dragover", event => {
+            event.preventDefault();
+            group.classList.add("drag-over");
+        });
+        group.addEventListener("dragleave", event => {
+            group.classList.remove("drag-over");
+        });
+        group.addEventListener("drop", event => {
+            event.preventDefault();
+            group.classList.remove("drag-over");
+            try {
+                const data = JSON.parse(event.dataTransfer.getData("application/json"));
+                if (data.type === "item" && data.categoryIndex !== index) {
+                    const sourceCategory = state.portfolio.categories[data.categoryIndex];
+                    const targetCategory = state.portfolio.categories[index];
+                    const itemToMove = sourceCategory.items.splice(data.itemIndex, 1)[0];
+                    targetCategory.items.push(itemToMove);
+                    state.categoryIndex = index;
+                    state.itemIndex = targetCategory.items.length - 1;
+                    markDirty();
+                    renderAll();
+                }
+            } catch (e) {
+                console.error("Drop error", e);
+            }
+        });
+
         const button = document.createElement("button");
         button.type = "button";
         button.className = "stack-button group-button";
@@ -388,6 +415,15 @@ function renderCategoryList() {
             const itemButton = document.createElement("button");
             itemButton.type = "button";
             itemButton.className = "item-subbutton";
+            itemButton.draggable = true;
+            itemButton.addEventListener("dragstart", event => {
+                event.dataTransfer.setData("application/json", JSON.stringify({
+                    type: "item",
+                    categoryIndex: index,
+                    itemIndex: itemIndex
+                }));
+                event.dataTransfer.effectAllowed = "move";
+            });
             itemButton.dataset.categoryIndex = String(index);
             itemButton.dataset.itemIndex = String(itemIndex);
             itemButton.classList.toggle("active", index === state.categoryIndex && itemIndex === state.itemIndex);

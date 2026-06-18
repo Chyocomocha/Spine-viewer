@@ -256,6 +256,12 @@ select {
     gap: 5px;
 }
 
+.tree-group.drag-over {
+    background: rgba(116, 168, 220, 0.1);
+    outline: 1px dashed rgba(116, 168, 220, 0.5);
+    border-radius: 6px;
+}
+
 .tree-items {
     display: grid;
     gap: 4px;
