@@ -8,238 +8,251 @@
   },
   "categories": [
     {
-      "id": "character",
-      "title": "Character",
-      "description": "Large character animation viewers.",
+      "id": "Capstone-projects",
+      "title": "Capstone Projects",
+      "description": "캡스톤 프로젝트 작업물",
       "hidden": false,
-      "items": [
+      "items": [],
+      "categories": [
         {
-          "id": "narin",
-          "name": "Narin",
-          "badge": "LD",
-          "file": "Narin.html",
-          "description": "으아아",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
+          "id": "character",
+          "title": "Character",
+          "description": "Large character animation viewers.",
+          "hidden": false,
+          "items": [
+            {
+              "id": "narin",
+              "name": "Narin",
+              "badge": "LD",
+              "file": "Narin.html",
+              "description": "으아아",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "narin-ik",
+              "name": "Narin IK",
+              "badge": "IK",
+              "file": "Narin_IK.html",
+              "description": "제가 열심히 작업한 나린입니다.\n\n\n으아아아윽\n집에가고 싶어요",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "mongle",
+              "name": "Mongle",
+              "badge": "LD",
+              "file": "Mongle.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "hina",
+              "name": "Hina",
+              "badge": "LD",
+              "file": "Hina.html",
+              "description": "히나입니다",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "siphon",
+              "name": "Siphon",
+              "badge": "LD",
+              "file": "Siphon.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            }
+          ],
+          "categories": []
         },
         {
-          "id": "narin-ik",
-          "name": "Narin IK",
-          "badge": "IK",
-          "file": "Narin_IK.html",
-          "description": "제가 열심히 작업한 나린입니다.\n\n\n으아아아윽\n집에가고 싶어요",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
+          "id": "sd-character",
+          "title": "SD Character",
+          "description": "Small character animation viewers.",
+          "hidden": false,
+          "items": [
+            {
+              "id": "sd-narin",
+              "name": "Narin",
+              "badge": "SD",
+              "file": "SD_Narin.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "sd-mongle",
+              "name": "Mongle",
+              "badge": "SD",
+              "file": "SD_Mongle.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "sd-hina",
+              "name": "Hina",
+              "badge": "SD",
+              "file": "SD_Hina.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "sd-siphon",
+              "name": "Siphon",
+              "badge": "SD",
+              "file": "SD_Siphon.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            }
+          ],
+          "categories": []
         },
         {
-          "id": "mongle",
-          "name": "Mongle",
-          "badge": "LD",
-          "file": "Mongle.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
+          "id": "cutscene",
+          "title": "Cutscene",
+          "description": "Story and scene animation viewers.",
+          "hidden": false,
+          "items": [
+            {
+              "id": "cut-narin",
+              "name": "Narin",
+              "badge": "Scene",
+              "file": "Narin_Story_Scene.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "cut-mongle",
+              "name": "Mongle",
+              "badge": "Scene",
+              "file": "Mongle_Story_Scene.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "cut-hina",
+              "name": "Hina",
+              "badge": "Scene",
+              "file": "Hina_Story_Scene.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            }
+          ],
+          "categories": []
         },
         {
-          "id": "hina",
-          "name": "Hina",
-          "badge": "LD",
-          "file": "Hina.html",
-          "description": "히나입니다",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "siphon",
-          "name": "Siphon",
-          "badge": "LD",
-          "file": "Siphon.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "id": "sd-character",
-      "title": "SD Character",
-      "description": "Small character animation viewers.",
-      "hidden": false,
-      "items": [
-        {
-          "id": "sd-narin",
-          "name": "Narin",
-          "badge": "SD",
-          "file": "SD_Narin.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "sd-mongle",
-          "name": "Mongle",
-          "badge": "SD",
-          "file": "SD_Mongle.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "sd-hina",
-          "name": "Hina",
-          "badge": "SD",
-          "file": "SD_Hina.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "sd-siphon",
-          "name": "Siphon",
-          "badge": "SD",
-          "file": "SD_Siphon.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "id": "cutscene",
-      "title": "Cutscene",
-      "description": "Story and scene animation viewers.",
-      "hidden": false,
-      "items": [
-        {
-          "id": "cut-narin",
-          "name": "Narin",
-          "badge": "Scene",
-          "file": "Narin_Story_Scene.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "cut-mongle",
-          "name": "Mongle",
-          "badge": "Scene",
-          "file": "Mongle_Story_Scene.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "cut-hina",
-          "name": "Hina",
-          "badge": "Scene",
-          "file": "Hina_Story_Scene.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "id": "monster",
-      "title": "Monster",
-      "description": "Monster and boss animation viewers.",
-      "hidden": false,
-      "items": [
-        {
-          "id": "flower",
-          "name": "Flower Monster",
-          "badge": "Boss",
-          "file": "Monster_Boss_Flower.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "flower-2",
-          "name": "Flower Boss 2",
-          "badge": "Boss",
-          "file": "Monster_Boss_Flower2.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "cragor",
-          "name": "Cragor",
-          "badge": "Boss",
-          "file": "CragorBoss.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "wing",
-          "name": "Wing",
-          "badge": "Boss",
-          "file": "Monster_Boss_Wing.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "mirelord",
-          "name": "Mirelord",
-          "badge": "Boss",
-          "file": "MirelordBoss.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
+          "id": "monster",
+          "title": "Monster",
+          "description": "Monster and boss animation viewers.",
+          "hidden": false,
+          "items": [
+            {
+              "id": "flower",
+              "name": "Flower Monster",
+              "badge": "Boss",
+              "file": "Monster_Boss_Flower.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "flower-2",
+              "name": "Flower Boss 2",
+              "badge": "Boss",
+              "file": "Monster_Boss_Flower2.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "cragor",
+              "name": "Cragor",
+              "badge": "Boss",
+              "file": "CragorBoss.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "wing",
+              "name": "Wing",
+              "badge": "Boss",
+              "file": "Monster_Boss_Wing.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "mirelord",
+              "name": "Mirelord",
+              "badge": "Boss",
+              "file": "MirelordBoss.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            }
+          ],
+          "categories": []
         }
       ]
     },
@@ -297,7 +310,8 @@
           "links": [],
           "hidden": false
         }
-      ]
+      ],
+      "categories": []
     },
     {
       "id": "personal-projects",
@@ -329,7 +343,8 @@
           "links": [],
           "hidden": false
         }
-      ]
+      ],
+      "categories": []
     }
   ]
 }
