@@ -83,11 +83,14 @@ function renderNav(nextCategories) {
             list.appendChild(button);
         });
 
-        if (category.categories) {
-            category.categories.forEach(sub => renderCategory(sub, list, depth + 1));
+        if (category.items.length > 0) {
+            section.appendChild(list);
         }
 
-        section.appendChild(list);
+        if (category.categories) {
+            category.categories.forEach(sub => renderCategory(sub, section, depth + 1));
+        }
+
         parentElement.appendChild(section);
     }
 
