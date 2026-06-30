@@ -8,14 +8,14 @@
   },
   "categories": [
     {
-      "id": "Capstone-projects",
+      "id": "joint-character",
       "title": "Capstone Projects",
       "description": "캡스톤 프로젝트 작업물",
       "hidden": false,
       "items": [],
       "categories": [
         {
-          "id": "character",
+          "id": "capstone-character",
           "title": "Character",
           "description": "Large character animation viewers.",
           "hidden": false,
@@ -25,7 +25,7 @@
               "name": "Narin",
               "badge": "LD",
               "file": "Narin.html",
-              "description": "으아아",
+              "description": "악어 수인 캐릭터\n악어 꼬리에 전체에 큰 움직임보다 끝 부분에 집중함으로 그 크기에 맞는 무게감을 표현하고자 함\n스스로를 무뚝뚝하고 차가움으로 포장하기에 감정 표현에 얼굴의 큰 움직임을 자제함",
               "role": "",
               "year": "",
               "tags": [],
@@ -37,7 +37,7 @@
               "name": "Narin IK",
               "badge": "IK",
               "file": "Narin_IK.html",
-              "description": "제가 열심히 작업한 나린입니다.\n\n\n으아아아윽\n집에가고 싶어요",
+              "description": "페이셜 트래킹용 페이지\n인 게임에 있던 얼굴을 쓰다듬을 수 있는 기능을 뷰어에 구현",
               "role": "",
               "year": "",
               "tags": [],
@@ -49,7 +49,7 @@
               "name": "Mongle",
               "badge": "LD",
               "file": "Mongle.html",
-              "description": "",
+              "description": "왕국의 둘째 공주 캐릭터\n왕족으로서 교육을 받으며 자라온 것을 표현하기 위해 과장되기 보단 절제 되어 있는 움직임을 구현\n나린과 마찬가지로 얼굴에 비춰지는 감정은 과장을 적게 만들어 큰 표현을 자제함",
               "role": "",
               "year": "",
               "tags": [],
@@ -61,7 +61,7 @@
               "name": "Hina",
               "badge": "LD",
               "file": "Hina.html",
-              "description": "히나입니다",
+              "description": "토끼 수인 / 혼혈 캐릭터\n츤데레라는 캐릭터 성에 맞게 호감과 관련된 감정은 까칠하게 표현하고 그 이외의 감정은 과장되게 묘사 및 일정 수준을 넘어갔을 시 당황하는 표현 강조\n현실주의와 어릴 때부터 차별로부터의 생존을 위해 생긴 수전노 기질을 표현함",
               "role": "",
               "year": "",
               "tags": [],
@@ -73,7 +73,7 @@
               "name": "Siphon",
               "badge": "LD",
               "file": "Siphon.html",
-              "description": "",
+              "description": "국가 원수 외동딸 / 무기 연구소 책임자 캐릭터\n당돌함과 남을 놀리는 가면과 조숙하고 천진난만함을 보여주기 위해 풍부하게 감정을 표현\n어린 나이를 보여주기 위해 가장 풍부하고 과장되도록 제작",
               "role": "",
               "year": "",
               "tags": [],
@@ -94,7 +94,7 @@
               "name": "Narin",
               "badge": "SD",
               "file": "SD_Narin.html",
-              "description": "",
+              "description": "인 게임 플레이 용 SD 캐릭터",
               "role": "",
               "year": "",
               "tags": [],
@@ -106,7 +106,7 @@
               "name": "Mongle",
               "badge": "SD",
               "file": "SD_Mongle.html",
-              "description": "",
+              "description": "인 게임 플레이 용 SD 캐릭터",
               "role": "",
               "year": "",
               "tags": [],
@@ -118,7 +118,7 @@
               "name": "Hina",
               "badge": "SD",
               "file": "SD_Hina.html",
-              "description": "",
+              "description": "인 게임 플레이 용 SD 캐릭터",
               "role": "",
               "year": "",
               "tags": [],
@@ -130,7 +130,7 @@
               "name": "Siphon",
               "badge": "SD",
               "file": "SD_Siphon.html",
-              "description": "",
+              "description": "인 게임 플레이 용 SD 캐릭터",
               "role": "",
               "year": "",
               "tags": [],
@@ -151,7 +151,7 @@
               "name": "Narin",
               "badge": "Scene",
               "file": "Narin_Story_Scene.html",
-              "description": "",
+              "description": "캐릭터 스토리 컷신\n블루아카이브 메모리얼을 참조해 감정 표현 기능을 추가",
               "role": "",
               "year": "",
               "tags": [],
@@ -163,7 +163,7 @@
               "name": "Mongle",
               "badge": "Scene",
               "file": "Mongle_Story_Scene.html",
-              "description": "",
+              "description": "캐릭터 스토리 컷신\n블루아카이브 메모리얼을 참조해 감정 표현 기능을 추가",
               "role": "",
               "year": "",
               "tags": [],
@@ -175,7 +175,7 @@
               "name": "Hina",
               "badge": "Scene",
               "file": "Hina_Story_Scene.html",
-              "description": "",
+              "description": "캐릭터 스토리 컷신\n블루아카이브 메모리얼을 참조해 감정 표현 기능을 추가",
               "role": "",
               "year": "",
               "tags": [],
@@ -263,18 +263,6 @@
       "hidden": false,
       "items": [
         {
-          "id": "artz",
-          "name": "Artz",
-          "badge": "Character",
-          "file": "Artz.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
           "id": "cola",
           "name": "Cola",
           "badge": "Character",
@@ -287,22 +275,10 @@
           "hidden": false
         },
         {
-          "id": "artz-ingame",
-          "name": "Artz Ingame",
-          "badge": "Ingame",
-          "file": "Artz_Ingame.html",
-          "description": "",
-          "role": "",
-          "year": "",
-          "tags": [],
-          "links": [],
-          "hidden": false
-        },
-        {
-          "id": "cola-ingame",
-          "name": "Cola Ingame",
-          "badge": "Ingame",
-          "file": "Cola_Ingame.html",
+          "id": "artz",
+          "name": "Artz",
+          "badge": "Character",
+          "file": "Artz.html",
           "description": "",
           "role": "",
           "year": "",
@@ -311,7 +287,41 @@
           "hidden": false
         }
       ],
-      "categories": []
+      "categories": [
+        {
+          "id": "ingame-character",
+          "title": "Ingame Character",
+          "description": "",
+          "hidden": false,
+          "items": [
+            {
+              "id": "cola-ingame",
+              "name": "Cola Ingame",
+              "badge": "Ingame",
+              "file": "Cola_Ingame.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            },
+            {
+              "id": "artz-ingame",
+              "name": "Artz Ingame",
+              "badge": "Ingame",
+              "file": "Artz_Ingame.html",
+              "description": "",
+              "role": "",
+              "year": "",
+              "tags": [],
+              "links": [],
+              "hidden": false
+            }
+          ],
+          "categories": []
+        }
+      ]
     },
     {
       "id": "personal-projects",
