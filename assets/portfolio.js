@@ -57,9 +57,10 @@ function renderSite(site, count) {
 function renderNav(nextCategories) {
     dom.nav.innerHTML = "";
 
-    nextCategories.forEach(category => {
+    function renderCategory(category, parentElement, depth) {
         const section = document.createElement("section");
         section.className = "group";
+        if (depth > 0) section.classList.add("nested-group");
 
         const title = document.createElement("h3");
         title.className = "group-title";
@@ -82,9 +83,15 @@ function renderNav(nextCategories) {
             list.appendChild(button);
         });
 
+        if (category.categories) {
+            category.categories.forEach(sub => renderCategory(sub, list, depth + 1));
+        }
+
         section.appendChild(list);
-        dom.nav.appendChild(section);
-    });
+        parentElement.appendChild(section);
+    }
+
+    nextCategories.forEach(category => renderCategory(category, dom.nav, 0));
 }
 
 function getInitialItemId() {

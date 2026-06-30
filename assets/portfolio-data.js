@@ -29,13 +29,15 @@ export function normalizeCategory(category, categoryIndex = 0) {
     const source = category && typeof category === "object" ? category : {};
     const title = stringValue(source.title, `Category ${categoryIndex + 1}`);
     const items = Array.isArray(source.items) ? source.items : [];
+    const subcategories = Array.isArray(source.categories) ? source.categories : [];
 
     return {
         id: stringValue(source.id, slugify(title) || `category-${categoryIndex + 1}`),
         title,
         description: stringValue(source.description, ""),
         hidden: Boolean(source.hidden),
-        items: items.map((item, itemIndex) => normalizeItem(item, itemIndex))
+        items: items.map((item, itemIndex) => normalizeItem(item, itemIndex)),
+        categories: subcategories.map((c, i) => normalizeCategory(c, i))
     };
 }
 
@@ -60,27 +62,43 @@ export function normalizeItem(item, itemIndex = 0) {
 
 export function flattenItems(portfolio, options = {}) {
     const includeHidden = Boolean(options.includeHidden);
-    return portfolio.categories.flatMap(category => {
-        if (!includeHidden && category.hidden) return [];
-        return category.items
-            .filter(item => includeHidden || !item.hidden)
-            .map(item => ({
-                ...item,
-                categoryId: category.id,
-                categoryTitle: category.title,
-                categoryHidden: category.hidden
-            }));
-    });
+    const items = [];
+    
+    function traverse(categories) {
+        categories.forEach(category => {
+            if (!includeHidden && category.hidden) return;
+            category.items.forEach(item => {
+                if (!includeHidden && item.hidden) return;
+                items.push({
+                    ...item,
+                    categoryId: category.id,
+                    categoryTitle: category.title,
+                    categoryHidden: category.hidden
+                });
+            });
+            if (category.categories) {
+                traverse(category.categories);
+            }
+        });
+    }
+    
+    traverse(portfolio.categories);
+    return items;
 }
 
 export function visibleCategories(portfolio) {
-    return portfolio.categories
-        .filter(category => !category.hidden)
-        .map(category => ({
-            ...category,
-            items: category.items.filter(item => !item.hidden)
-        }))
-        .filter(category => category.items.length);
+    function traverse(categories) {
+        return categories
+            .filter(category => !category.hidden)
+            .map(category => ({
+                ...category,
+                items: category.items.filter(item => !item.hidden),
+                categories: traverse(category.categories || [])
+            }))
+            .filter(category => category.items.length || category.categories.length);
+    }
+    
+    return traverse(portfolio.categories);
 }
 
 export function validatePortfolio(portfolio) {
@@ -92,25 +110,33 @@ export function validatePortfolio(portfolio) {
 
     if (!portfolio.site.title.trim()) errors.push("Site title is required.");
 
-    portfolio.categories.forEach((category, categoryIndex) => {
-        const categoryLabel = category.title || `Category ${categoryIndex + 1}`;
-        if (!category.id.trim()) errors.push(`${categoryLabel}: category id is required.`);
-        if (categoryIds.has(category.id)) errors.push(`Duplicate category id: ${category.id}`);
-        categoryIds.add(category.id);
-        if (!category.title.trim()) errors.push(`${categoryLabel}: category title is required.`);
+    function validateCategories(categories) {
+        categories.forEach((category, categoryIndex) => {
+            const categoryLabel = category.title || `Category ${categoryIndex + 1}`;
+            if (!category.id.trim()) errors.push(`${categoryLabel}: category id is required.`);
+            if (categoryIds.has(category.id)) errors.push(`Duplicate category id: ${category.id}`);
+            categoryIds.add(category.id);
+            if (!category.title.trim()) errors.push(`${categoryLabel}: category title is required.`);
 
-        category.items.forEach((item, itemIndex) => {
-            const itemLabel = item.name || `${categoryLabel} item ${itemIndex + 1}`;
-            if (!item.id.trim()) errors.push(`${itemLabel}: item id is required.`);
-            if (itemIds.has(item.id)) errors.push(`Duplicate item id: ${item.id}`);
-            itemIds.add(item.id);
-            if (!item.name.trim()) errors.push(`${itemLabel}: item name is required.`);
-            if (!item.file.trim()) errors.push(`${itemLabel}: file path is required.`);
-            if (item.links.some(link => link.url && !isValidHttpUrl(link.url))) {
-                errors.push(`${itemLabel}: links must start with http:// or https://.`);
+            category.items.forEach((item, itemIndex) => {
+                const itemLabel = item.name || `${categoryLabel} item ${itemIndex + 1}`;
+                if (!item.id.trim()) errors.push(`${itemLabel}: item id is required.`);
+                if (itemIds.has(item.id)) errors.push(`Duplicate item id: ${item.id}`);
+                itemIds.add(item.id);
+                if (!item.name.trim()) errors.push(`${itemLabel}: item name is required.`);
+                if (!item.file.trim()) errors.push(`${itemLabel}: file path is required.`);
+                if (item.links.some(link => link.url && !isValidHttpUrl(link.url))) {
+                    errors.push(`${itemLabel}: links must start with http:// or https://.`);
+                }
+            });
+
+            if (category.categories) {
+                validateCategories(category.categories);
             }
         });
-    });
+    }
+
+    validateCategories(portfolio.categories);
 
     const visibleItems = flattenItems(portfolio);
     if (!visibleItems.length) errors.push("At least one visible work is required.");
@@ -135,7 +161,8 @@ export function makeCategory(existingCategories = []) {
         title: "New Category",
         description: "",
         hidden: false,
-        items: []
+        items: [],
+        categories: []
     };
 }
 

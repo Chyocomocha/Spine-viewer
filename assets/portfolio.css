@@ -86,6 +86,14 @@ button {
     margin-bottom: 18px;
 }
 
+.nested-group {
+    margin-top: 10px;
+    margin-left: 12px;
+    margin-bottom: 0;
+    padding-left: 8px;
+    border-left: 1px solid var(--line);
+}
+
 .group-title {
     margin: 0 0 8px;
     padding: 0 4px;

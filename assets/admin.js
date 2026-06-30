@@ -58,7 +58,7 @@ const dom = {
 
 const state = {
     portfolio: null,
-    categoryIndex: 0,
+    categoryId: null,
     itemIndex: 0,
     selectionMode: "work",
     activeTab: "work",
@@ -94,8 +94,15 @@ function bindEvents() {
     });
 
     dom.addCategory.addEventListener("click", () => {
-        state.portfolio.categories.push(makeCategory(state.portfolio.categories));
-        state.categoryIndex = state.portfolio.categories.length - 1;
+        const newCat = makeCategory(flattenCategories(state.portfolio.categories));
+        const currentCat = selectedCategory();
+        if (currentCat) {
+            currentCat.categories = currentCat.categories || [];
+            currentCat.categories.push(newCat);
+        } else {
+            state.portfolio.categories.push(newCat);
+        }
+        state.categoryId = newCat.id;
         state.itemIndex = 0;
         setEditorMode("group");
         markDirty();
@@ -105,7 +112,7 @@ function bindEvents() {
     dom.categoryList.addEventListener("click", event => {
         const itemButton = event.target.closest("[data-item-index]");
         if (itemButton) {
-            state.categoryIndex = Number(itemButton.dataset.categoryIndex);
+            state.categoryId = itemButton.dataset.categoryId;
             state.itemIndex = Number(itemButton.dataset.itemIndex);
             setEditorMode("work");
             setTab("work");
@@ -115,9 +122,9 @@ function bindEvents() {
             return;
         }
 
-        const button = event.target.closest("[data-category-index]");
+        const button = event.target.closest("[data-category-id]");
         if (!button) return;
-        state.categoryIndex = Number(button.dataset.categoryIndex);
+        state.categoryId = button.dataset.categoryId;
         state.itemIndex = 0;
         setEditorMode("group");
         const category = selectedCategory();
@@ -155,6 +162,7 @@ function bindEvents() {
         const category = selectedCategory();
         if (!category) return;
         category.id = value;
+        state.categoryId = value;
         renderCategoryList();
         renderSelectionSummary();
         renderGroupFocus();
@@ -209,7 +217,7 @@ function bindEvents() {
         if (item) item.file = value;
     });
     dom.itemCategory.addEventListener("change", () => {
-        moveItemToCategory(Number(dom.itemCategory.value));
+        moveItemToCategory(dom.itemCategory.value);
     });
     bindInput(dom.itemRole, value => {
         const item = selectedItem();
@@ -265,7 +273,7 @@ async function reloadPortfolio(keepStatus) {
         window.clearTimeout(state.saveTimer);
         setStatus("데이터 불러오는 중...", "");
         state.portfolio = await loadPortfolio();
-        state.categoryIndex = 0;
+        state.categoryId = null;
         state.itemIndex = 0;
         state.selectionMode = "work";
         state.dirty = false;
@@ -359,13 +367,18 @@ function renderDefaultOptions() {
 
 function renderCategoryList() {
     dom.categoryList.innerHTML = "";
-    state.portfolio.categories.forEach((category, index) => {
+    
+    function renderNode(category, parentElement, depth) {
         const group = document.createElement("div");
         group.className = "tree-group";
-        group.classList.toggle("active-group", index === state.categoryIndex);
+        if (depth > 0) {
+            group.classList.add("nested");
+        }
+        group.classList.toggle("active-group", category.id === state.categoryId);
 
         group.addEventListener("dragover", event => {
             event.preventDefault();
+            event.stopPropagation();
             group.classList.add("drag-over");
         });
         group.addEventListener("dragleave", event => {
@@ -373,18 +386,31 @@ function renderCategoryList() {
         });
         group.addEventListener("drop", event => {
             event.preventDefault();
+            event.stopPropagation();
             group.classList.remove("drag-over");
             try {
                 const data = JSON.parse(event.dataTransfer.getData("application/json"));
-                if (data.type === "item" && data.categoryIndex !== index) {
-                    const sourceCategory = state.portfolio.categories[data.categoryIndex];
-                    const targetCategory = state.portfolio.categories[index];
-                    const itemToMove = sourceCategory.items.splice(data.itemIndex, 1)[0];
-                    targetCategory.items.push(itemToMove);
-                    state.categoryIndex = index;
-                    state.itemIndex = targetCategory.items.length - 1;
-                    markDirty();
-                    renderAll();
+                if (data.type === "item" && data.categoryId !== category.id) {
+                    const sourceData = findCategoryData(data.categoryId);
+                    if (sourceData) {
+                        const itemToMove = sourceData.category.items.splice(data.itemIndex, 1)[0];
+                        category.items.push(itemToMove);
+                        state.categoryId = category.id;
+                        state.itemIndex = category.items.length - 1;
+                        markDirty();
+                        renderAll();
+                    }
+                } else if (data.type === "group" && data.categoryId !== category.id) {
+                    const sourceData = findCategoryData(data.categoryId);
+                    if (sourceData && !isDescendant(sourceData.category, category)) {
+                        // root level container case
+                        const parentArr = sourceData.parentArray;
+                        const groupToMove = parentArr.splice(sourceData.index, 1)[0];
+                        category.categories.push(groupToMove);
+                        state.categoryId = groupToMove.id;
+                        markDirty();
+                        renderAll();
+                    }
                 }
             } catch (e) {
                 console.error("Drop error", e);
@@ -394,8 +420,18 @@ function renderCategoryList() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "stack-button group-button";
-        button.dataset.categoryIndex = String(index);
-        button.classList.toggle("active", index === state.categoryIndex);
+        button.dataset.categoryId = category.id;
+        button.classList.toggle("active", category.id === state.categoryId);
+        button.draggable = true;
+        button.addEventListener("dragstart", event => {
+            event.stopPropagation();
+            event.dataTransfer.setData("application/json", JSON.stringify({
+                type: "group",
+                categoryId: category.id
+            }));
+            event.dataTransfer.effectAllowed = "move";
+        });
+        
         button.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
         button.querySelector(".stack-name").textContent = category.title || "(이름 없음)";
         button.querySelector(".stack-meta").textContent = `${category.items.length}개${category.hidden ? " 숨김" : ""}`;
@@ -404,10 +440,10 @@ function renderCategoryList() {
         const itemList = document.createElement("div");
         itemList.className = "tree-items";
 
-        if (!category.items.length) {
+        if (!category.items.length && (!category.categories || !category.categories.length)) {
             const empty = document.createElement("div");
             empty.className = "tree-empty";
-            empty.textContent = "작업물 없음";
+            empty.textContent = "작업물/하위 그룹 없음";
             itemList.appendChild(empty);
         }
 
@@ -417,25 +453,62 @@ function renderCategoryList() {
             itemButton.className = "item-subbutton";
             itemButton.draggable = true;
             itemButton.addEventListener("dragstart", event => {
+                event.stopPropagation();
                 event.dataTransfer.setData("application/json", JSON.stringify({
                     type: "item",
-                    categoryIndex: index,
+                    categoryId: category.id,
                     itemIndex: itemIndex
                 }));
                 event.dataTransfer.effectAllowed = "move";
             });
-            itemButton.dataset.categoryIndex = String(index);
+            itemButton.dataset.categoryId = category.id;
             itemButton.dataset.itemIndex = String(itemIndex);
-            itemButton.classList.toggle("active", index === state.categoryIndex && itemIndex === state.itemIndex);
+            itemButton.classList.toggle("active", category.id === state.categoryId && itemIndex === state.itemIndex);
             itemButton.innerHTML = `<span class="stack-name"></span><span class="stack-meta"></span>`;
             itemButton.querySelector(".stack-name").textContent = item.name || "(이름 없음)";
             itemButton.querySelector(".stack-meta").textContent = `${item.badge || item.id}${item.hidden ? " 숨김" : ""}`;
             itemList.appendChild(itemButton);
         });
 
+        if (category.categories) {
+            category.categories.forEach(sub => renderNode(sub, itemList, depth + 1));
+        }
+
         group.appendChild(itemList);
-        dom.categoryList.appendChild(group);
+        parentElement.appendChild(group);
+    }
+
+    state.portfolio.categories.forEach(cat => renderNode(cat, dom.categoryList, 0));
+    
+    // Add a drop zone at the very bottom to allow dragging groups back to the root
+    const rootDropZone = document.createElement("div");
+    rootDropZone.className = "root-drop-zone";
+    rootDropZone.textContent = "최상위로 이동 (여기에 드롭)";
+    rootDropZone.addEventListener("dragover", event => {
+        event.preventDefault();
+        rootDropZone.classList.add("drag-over");
     });
+    rootDropZone.addEventListener("dragleave", event => {
+        rootDropZone.classList.remove("drag-over");
+    });
+    rootDropZone.addEventListener("drop", event => {
+        event.preventDefault();
+        rootDropZone.classList.remove("drag-over");
+        try {
+            const data = JSON.parse(event.dataTransfer.getData("application/json"));
+            if (data.type === "group") {
+                const sourceData = findCategoryData(data.categoryId);
+                if (sourceData && sourceData.parentArray !== state.portfolio.categories) {
+                    const groupToMove = sourceData.parentArray.splice(sourceData.index, 1)[0];
+                    state.portfolio.categories.push(groupToMove);
+                    state.categoryId = groupToMove.id;
+                    markDirty();
+                    renderAll();
+                }
+            }
+        } catch(e) {}
+    });
+    dom.categoryList.appendChild(rootDropZone);
 }
 
 function renderCategoryForm() {
@@ -582,11 +655,46 @@ function renderEditorMode() {
 }
 
 function selectedCategory() {
-    return state.portfolio?.categories[state.categoryIndex] || null;
+    if (!state.categoryId && state.portfolio?.categories?.length) {
+        state.categoryId = state.portfolio.categories[0].id;
+    }
+    const data = findCategoryData(state.categoryId);
+    return data ? data.category : null;
 }
 
 function selectedItem() {
-    return selectedCategory()?.items[state.itemIndex] || null;
+    const cat = selectedCategory();
+    return cat?.items[state.itemIndex] || null;
+}
+
+function findCategoryData(id, categories = state.portfolio?.categories, parentArray = null, indexInParent = -1) {
+    if (!categories) return null;
+    for (let i = 0; i < categories.length; i++) {
+        const cat = categories[i];
+        if (cat.id === id) return { category: cat, parentArray: categories, index: i };
+        if (cat.categories && cat.categories.length) {
+            const found = findCategoryData(id, cat.categories, categories, i);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function flattenCategories(categories, result = []) {
+    categories.forEach(cat => {
+        result.push(cat);
+        if (cat.categories) flattenCategories(cat.categories, result);
+    });
+    return result;
+}
+
+function isDescendant(sourceCat, targetCat) {
+    if (sourceCat.id === targetCat.id) return true;
+    if (!sourceCat.categories) return false;
+    for (const sub of sourceCat.categories) {
+        if (isDescendant(sub, targetCat)) return true;
+    }
+    return false;
 }
 
 function renderSelectionSummary() {
@@ -624,14 +732,18 @@ function renderWorkFocus() {
 
 function ensureSelection() {
     if (!state.portfolio.categories.length) {
-        state.categoryIndex = 0;
+        state.categoryId = null;
         state.itemIndex = 0;
         return;
     }
 
-    state.categoryIndex = clamp(state.categoryIndex, 0, state.portfolio.categories.length - 1);
+    const data = findCategoryData(state.categoryId);
+    if (!data) {
+        state.categoryId = state.portfolio.categories[0].id;
+    }
+    
     const category = selectedCategory();
-    if (!category.items.length) {
+    if (!category || !category.items.length) {
         state.itemIndex = 0;
         return;
     }
@@ -639,10 +751,11 @@ function ensureSelection() {
 }
 
 function deleteCategory() {
-    if (!selectedCategory()) return;
-    if (!window.confirm("선택한 그룹을 삭제할까요?")) return;
-    state.portfolio.categories.splice(state.categoryIndex, 1);
-    state.categoryIndex = Math.max(0, state.categoryIndex - 1);
+    const data = findCategoryData(state.categoryId);
+    if (!data) return;
+    if (!window.confirm("선택한 그룹과 하위 데이터를 모두 삭제할까요?")) return;
+    data.parentArray.splice(data.index, 1);
+    state.categoryId = null;
     state.itemIndex = 0;
     markDirty();
     renderAll();
@@ -659,16 +772,18 @@ function moveItem(direction) {
     renderAll();
 }
 
-function moveItemToCategory(nextCategoryIndex) {
+function moveItemToCategory(nextCategoryId) {
     const sourceCategory = selectedCategory();
     const item = selectedItem();
-    if (!sourceCategory || !item || nextCategoryIndex === state.categoryIndex) return;
-    const targetCategory = state.portfolio.categories[nextCategoryIndex];
-    if (!targetCategory) return;
-
+    if (!sourceCategory || !item || nextCategoryId === state.categoryId) return;
+    
+    const targetData = findCategoryData(nextCategoryId);
+    if (!targetData) return;
+    
+    const targetCategory = targetData.category;
     sourceCategory.items.splice(state.itemIndex, 1);
     targetCategory.items.push(item);
-    state.categoryIndex = nextCategoryIndex;
+    state.categoryId = nextCategoryId;
     state.itemIndex = targetCategory.items.length - 1;
     markDirty();
     renderAll();
@@ -686,13 +801,18 @@ function deleteItem() {
 
 function renderItemCategoryOptions() {
     dom.itemCategory.innerHTML = "";
-    state.portfolio.categories.forEach((category, index) => {
-        const option = document.createElement("option");
-        option.value = String(index);
-        option.textContent = category.title || category.id || `Category ${index + 1}`;
-        dom.itemCategory.appendChild(option);
-    });
-    dom.itemCategory.value = String(state.categoryIndex);
+    function traverse(categories, depth = 0) {
+        categories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category.id;
+            const indent = "\u00A0\u00A0\u00A0\u00A0".repeat(depth);
+            option.textContent = indent + (category.title || category.id);
+            dom.itemCategory.appendChild(option);
+            if (category.categories) traverse(category.categories, depth + 1);
+        });
+    }
+    traverse(state.portfolio.categories);
+    dom.itemCategory.value = state.categoryId;
 }
 
 function addLink() {
