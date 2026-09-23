@@ -6,6 +6,12 @@
     "description": "A curated portfolio of Spine animation and character work.",
     "defaultItemId": "narin"
   },
+  "featured": [
+    { "strength": "전투 모션 · 곡괭이 제어", "itemIds": ["cola-ingame"] },
+    { "strength": "입체 회전 · 얼굴 터치 상호작용", "itemIds": ["narin", "narin-ik"] },
+    { "strength": "독립적인 검 제어", "itemIds": ["artz-ingame"] },
+    { "strength": "캐릭터 성격 · 감정 연기", "itemIds": ["siphon"] }
+  ],
   "categories": [
     {
       "id": "joint-character",

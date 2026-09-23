@@ -56,6 +56,7 @@ function renderSite(site, count) {
 
 function renderNav(nextCategories) {
     dom.nav.innerHTML = "";
+    renderFeatured();
 
     function renderCategory(category, parentElement, depth) {
         const section = document.createElement("section");
@@ -71,16 +72,7 @@ function renderNav(nextCategories) {
         list.className = "item-list";
 
         category.items.forEach(item => {
-            const button = document.createElement("button");
-            button.className = "item-button";
-            button.type = "button";
-            button.dataset.itemId = item.id;
-            button.innerHTML = `<span class="item-name"></span><span class="item-badge"></span>`;
-            button.querySelector(".item-name").textContent = item.name;
-            button.querySelector(".item-badge").textContent = item.badge;
-            button.querySelector(".item-badge").hidden = !item.badge;
-            button.addEventListener("click", () => selectItem(item.id, true));
-            list.appendChild(button);
+            list.appendChild(createItemButton(item));
         });
 
         if (category.items.length > 0) {
@@ -95,6 +87,49 @@ function renderNav(nextCategories) {
     }
 
     nextCategories.forEach(category => renderCategory(category, dom.nav, 0));
+}
+
+function createItemButton(item) {
+    const button = document.createElement("button");
+    button.className = "item-button";
+    button.type = "button";
+    button.dataset.itemId = item.id;
+    button.innerHTML = `<span class="item-name"></span><span class="item-badge"></span>`;
+    button.querySelector(".item-name").textContent = item.name;
+    button.querySelector(".item-badge").textContent = item.badge;
+    button.querySelector(".item-badge").hidden = !item.badge;
+    button.addEventListener("click", () => selectItem(item.id, true));
+    return button;
+}
+
+function renderFeatured() {
+    const section = document.createElement("section");
+    section.className = "group featured";
+    section.setAttribute("aria-labelledby", "featured-title");
+    const title = document.createElement("h3");
+    title.id = "featured-title";
+    title.className = "group-title";
+    title.textContent = "대표작";
+    const list = document.createElement("ol");
+    list.className = "featured-list";
+
+    portfolio.featured.forEach(entry => {
+        // Resolve only visible originals so hidden or deleted works never leak here.
+        const items = entry.itemIds.map(id => allItems.find(item => item.id === id)).filter(Boolean);
+        if (!items.length) return;
+        const card = document.createElement("li");
+        card.className = "featured-card";
+        const strength = document.createElement("p");
+        strength.className = "featured-strength";
+        strength.textContent = entry.strength;
+        strength.hidden = !entry.strength;
+        card.appendChild(strength);
+        items.forEach(item => card.appendChild(createItemButton(item)));
+        list.appendChild(card);
+    });
+    if (!list.children.length) return;
+    section.append(title, list);
+    dom.nav.appendChild(section);
 }
 
 function getInitialItemId() {
@@ -127,6 +162,8 @@ function renderCurrentItem(item) {
 function setActiveButton(itemId) {
     document.querySelectorAll(".item-button").forEach(button => {
         button.classList.toggle("active", button.dataset.itemId === itemId);
+        if (button.dataset.itemId === itemId) button.setAttribute("aria-current", "true");
+        else button.removeAttribute("aria-current");
     });
 }
 

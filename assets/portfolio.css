@@ -94,6 +94,51 @@ button {
     border-left: 1px solid var(--line);
 }
 
+.featured {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.featured-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: featured;
+}
+
+.featured-card {
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    counter-increment: featured;
+}
+
+.featured-strength {
+    margin: 0 2px 6px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.featured-strength::before {
+    content: counter(featured, decimal-leading-zero) " / ";
+    color: var(--accent-strong);
+}
+
+.featured .item-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.item-button:focus-visible {
+    outline: 2px solid var(--accent-strong);
+    outline-offset: 2px;
+}
+
 .group-title {
     margin: 0 0 8px;
     padding: 0 4px;
@@ -310,9 +355,18 @@ button {
 
     .nav {
         display: flex;
+        flex-wrap: wrap;
         gap: 12px;
         overflow-x: auto;
         padding: 10px 12px 12px;
+    }
+
+    .nav > .featured {
+        flex-basis: 100%;
+    }
+
+    .featured-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .group {

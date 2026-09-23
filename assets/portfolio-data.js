@@ -21,6 +21,11 @@ export function normalizePortfolio(raw) {
             description: stringValue(site.description, ""),
             defaultItemId: stringValue(site.defaultItemId, "")
         },
+        featured: (Array.isArray(source.featured) ? source.featured : []).map(entry => ({
+            strength: stringValue(entry?.strength, ""),
+            itemIds: [...new Set((Array.isArray(entry?.itemIds) ? entry.itemIds : [])
+                .filter(id => typeof id === "string").map(id => id.trim()).filter(Boolean))]
+        })),
         categories: categories.map((category, categoryIndex) => normalizeCategory(category, categoryIndex))
     };
 }
