@@ -21,6 +21,7 @@ const dom = {
     featuredSettingsToggle: document.getElementById("featured-settings-toggle"),
     featuredSettingsPanel: document.getElementById("featured-settings-panel"),
     featuredFields: document.getElementById("featured-fields"),
+    featuredTitle: document.getElementById("featured-section-title"),
     addCategory: document.getElementById("add-category-button"),
     categoryList: document.getElementById("category-list"),
     addItem: document.getElementById("add-item-button"),
@@ -91,6 +92,10 @@ function bindEvents() {
         dom.featuredSettingsPanel.hidden = !open;
         dom.featuredSettingsToggle.setAttribute("aria-expanded", String(open));
         dom.featuredSettingsToggle.classList.toggle("active", open);
+    });
+
+    bindInput(dom.featuredTitle, value => {
+        if (state.portfolio) state.portfolio.site.featuredTitle = value;
     });
 
     dom.featuredFields.addEventListener("input", event => {
@@ -368,6 +373,7 @@ function renderAll() {
 }
 
 function renderFeaturedForm() {
+    dom.featuredTitle.value = state.portfolio.site.featuredTitle;
     dom.featuredFields.innerHTML = "";
     const items = flattenItems(state.portfolio, { includeHidden: true });
     state.portfolio.featured.forEach((entry, index) => {
@@ -383,12 +389,12 @@ function renderFeaturedForm() {
         input.type = "text";
         input.dataset.featuredIndex = String(index);
         input.value = entry.strength;
-        input.placeholder = "대표작의 강점을 짧게 입력하세요";
+        input.placeholder = "주요 작업의 강점을 짧게 입력하세요";
         label.append(title, input);
         dom.featuredFields.appendChild(label);
     });
     if (!state.portfolio.featured.length) {
-        dom.featuredFields.textContent = "등록된 대표작이 없습니다.";
+        dom.featuredFields.textContent = "등록된 주요 작업이 없습니다.";
     }
 }
 

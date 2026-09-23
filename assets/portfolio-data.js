@@ -19,7 +19,8 @@ export function normalizePortfolio(raw) {
             title: stringValue(site.title, "Spine Portfolio"),
             subtitle: stringValue(site.subtitle, ""),
             description: stringValue(site.description, ""),
-            defaultItemId: stringValue(site.defaultItemId, "")
+            defaultItemId: stringValue(site.defaultItemId, ""),
+            featuredTitle: stringValue(site.featuredTitle, "주요 작업") || "주요 작업"
         },
         featured: (Array.isArray(source.featured) ? source.featured : []).map(entry => ({
             strength: stringValue(entry?.strength, ""),

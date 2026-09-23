@@ -109,7 +109,7 @@ function renderFeatured() {
     const title = document.createElement("h3");
     title.id = "featured-title";
     title.className = "group-title";
-    title.textContent = "대표작";
+    title.textContent = portfolio.site.featuredTitle;
     const list = document.createElement("ol");
     list.className = "featured-list";
 

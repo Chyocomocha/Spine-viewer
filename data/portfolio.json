@@ -4,7 +4,8 @@
     "title": "이태헌 포트폴리오",
     "subtitle": "Interactive animation works",
     "description": "A curated portfolio of Spine animation and character work.",
-    "defaultItemId": "narin"
+    "defaultItemId": "narin",
+    "featuredTitle": "주요 작업"
   },
   "featured": [
     { "strength": "전투 모션 · 곡괭이 제어", "itemIds": ["cola-ingame"] },
@@ -15,14 +16,14 @@
   "categories": [
     {
       "id": "joint-character",
-      "title": "Capstone Projects",
+      "title": "캡스톤 프로젝트",
       "description": "캡스톤 프로젝트 작업물",
       "hidden": false,
       "items": [],
       "categories": [
         {
           "id": "capstone-character",
-          "title": "Character",
+          "title": "LD 캐릭터",
           "description": "Large character animation viewers.",
           "hidden": false,
           "items": [
@@ -91,7 +92,7 @@
         },
         {
           "id": "sd-character",
-          "title": "SD Character",
+          "title": "SD 캐릭터",
           "description": "Small character animation viewers.",
           "hidden": false,
           "items": [
@@ -148,7 +149,7 @@
         },
         {
           "id": "cutscene",
-          "title": "Cutscene",
+          "title": "컷신",
           "description": "Story and scene animation viewers.",
           "hidden": false,
           "items": [
@@ -193,7 +194,7 @@
         },
         {
           "id": "monster",
-          "title": "Monster",
+          "title": "몬스터",
           "description": "Monster and boss animation viewers.",
           "hidden": false,
           "items": [
@@ -264,7 +265,7 @@
     },
     {
       "id": "joint-projects",
-      "title": "Joint Projects",
+      "title": "공동 작업",
       "description": "Collaborative character and ingame animation work.",
       "hidden": false,
       "items": [
@@ -296,7 +297,7 @@
       "categories": [
         {
           "id": "ingame-character",
-          "title": "Ingame Character",
+          "title": "인게임 캐릭터",
           "description": "",
           "hidden": false,
           "items": [
@@ -331,7 +332,7 @@
     },
     {
       "id": "personal-projects",
-      "title": "Personal Projects",
+      "title": "개인 작업",
       "description": "Personal projects using AI resources\nUse ComfyUI",
       "hidden": false,
       "items": [
