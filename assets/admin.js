@@ -18,6 +18,9 @@ const dom = {
     save: document.getElementById("save-button"),
     siteSettingsToggle: document.getElementById("site-settings-toggle"),
     siteSettingsPanel: document.getElementById("site-settings-panel"),
+    featuredSettingsToggle: document.getElementById("featured-settings-toggle"),
+    featuredSettingsPanel: document.getElementById("featured-settings-panel"),
+    featuredFields: document.getElementById("featured-fields"),
     addCategory: document.getElementById("add-category-button"),
     categoryList: document.getElementById("category-list"),
     addItem: document.getElementById("add-item-button"),
@@ -82,6 +85,23 @@ function bindEvents() {
     });
 
     dom.save.addEventListener("click", () => savePortfolio({ manual: true }));
+
+    dom.featuredSettingsToggle.addEventListener("click", () => {
+        const open = dom.featuredSettingsPanel.hidden;
+        dom.featuredSettingsPanel.hidden = !open;
+        dom.featuredSettingsToggle.setAttribute("aria-expanded", String(open));
+        dom.featuredSettingsToggle.classList.toggle("active", open);
+    });
+
+    dom.featuredFields.addEventListener("input", event => {
+        const input = event.target.closest("[data-featured-index]");
+        if (!input || !state.portfolio) return;
+        const entry = state.portfolio.featured[Number(input.dataset.featuredIndex)];
+        if (!entry) return;
+        entry.strength = input.value;
+        markDirty();
+        renderJsonAndValidation();
+    });
 
     dom.siteSettingsToggle.addEventListener("click", () => {
         const shouldOpen = dom.siteSettingsPanel.hidden;
@@ -340,10 +360,36 @@ function renderAll() {
     renderEditorMode();
     renderSelectionSummary();
     renderSiteForm();
+    renderFeaturedForm();
     renderCategoryList();
     renderCategoryForm();
     renderItemForm();
     renderJsonAndValidation();
+}
+
+function renderFeaturedForm() {
+    dom.featuredFields.innerHTML = "";
+    const items = flattenItems(state.portfolio, { includeHidden: true });
+    state.portfolio.featured.forEach((entry, index) => {
+        const label = document.createElement("label");
+        label.className = "field";
+        const title = document.createElement("span");
+        const names = entry.itemIds.map(id => {
+            const item = items.find(item => item.id === id);
+            return item ? [item.name, item.badge].filter(Boolean).join(" · ") : `${id} (작업물 없음)`;
+        });
+        title.textContent = `${index + 1}. ${names.join(" / ") || "연결된 작업물 없음"}`;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.dataset.featuredIndex = String(index);
+        input.value = entry.strength;
+        input.placeholder = "대표작의 강점을 짧게 입력하세요";
+        label.append(title, input);
+        dom.featuredFields.appendChild(label);
+    });
+    if (!state.portfolio.featured.length) {
+        dom.featuredFields.textContent = "등록된 대표작이 없습니다.";
+    }
 }
 
 function renderSiteForm() {
