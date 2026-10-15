@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일러스트 애니메이션 및 연출</title>
+<script src="https://unpkg.com/@esotericsoftware/spine-player@4.2/dist/iife/spine-player.js"></script>
+<style>
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #191919; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #status { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 24px; color: #eee; font: 14px/1.5 sans-serif; text-align: center; }
+    #status[hidden] { display: none; }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="히나, 몽글, 나린 일러스트 애니메이션 및 연출"></canvas>
+<p id="status" role="status">연출을 불러오는 중입니다.</p>
+<script src="./assets/wallpaper-fever.js"></script>
+</body>
+</html>
